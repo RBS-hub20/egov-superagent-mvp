@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   eGov SuperAgent — deep navy canvas, Action Blue accent, hairline borders.
-   Component-level classes are namespaced `eg-*`.
+   eGov SuperAgent
+
+   Two surfaces live in this app and they are deliberately different:
+
+   1. The landing (/) is themed — light by default, dark on `html.dark`.
+   2. The console (/app) is fixed dark chrome (`eg-*` classes below). It never
+      follows the theme toggle, so operators get one consistent workspace.
    ========================================================================== */
 
 @layer base {
@@ -15,23 +20,221 @@
       Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
     --font-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas",
       "Liberation Mono", monospace;
+
+    /* Landing tokens — light */
+    --lp-bg-inner: #fefeff;
+    --lp-bg-outer: #f0f4ff;
+    --lp-card: rgba(255, 255, 255, 0.8);
+    --lp-card-solid: #ffffff;
+    --lp-line: #e2e8f0;
+    --lp-text: #0a1931;
+    --lp-muted: #475569;
+    --lp-primary: #0f46f3;
+    --lp-grid: rgba(10, 25, 49, 0.55);
+    color-scheme: light;
   }
 
-  html {
+  html.dark {
+    /* Landing tokens — dark */
+    --lp-bg-inner: #0f1c3f;
+    --lp-bg-outer: #050a1e;
+    --lp-card: rgba(16, 26, 51, 0.72);
+    --lp-card-solid: #101a33;
+    --lp-line: #1e2b4d;
+    --lp-text: #f8fafc;
+    --lp-muted: #94a3b8;
+    --lp-primary: #3b82f6;
+    --lp-grid: rgba(226, 232, 240, 0.5);
     color-scheme: dark;
   }
 
   body {
-    background-color: #050a18;
-    color: #e6ecf7;
+    background-color: var(--lp-bg-outer);
+    color: var(--lp-text);
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Theme changes should read as a dissolve, not a repaint. */
+    transition: background-color 0.5s ease, color 0.4s ease;
   }
 
-  /* Focus rings stay visible for keyboard users on every surface. */
   :focus-visible {
-    outline-color: #1e90ff;
+    outline: 2px solid var(--lp-primary);
+    outline-offset: 2px;
   }
 }
+
+/* --------------------------------------------------------------- landing -- */
+
+.lp-canvas {
+  background:
+    radial-gradient(1200px 900px at 50% -10%, var(--lp-bg-inner), transparent 70%),
+    radial-gradient(900px 700px at 100% 0%, var(--lp-bg-inner), transparent 60%),
+    var(--lp-bg-outer);
+  transition: background-color 0.5s ease;
+}
+
+/* Dot grid — barely there, enough to give the canvas texture. */
+.lp-dots {
+  background-image: radial-gradient(var(--lp-grid) 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: 0.04;
+  mask-image: radial-gradient(circle at 50% 30%, black, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, black, transparent 78%);
+}
+
+.lp-card {
+  background: var(--lp-card);
+  border: 1px solid var(--lp-line);
+  backdrop-filter: blur(14px);
+  transition: background-color 0.4s ease, border-color 0.4s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+
+.lp-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 60px -28px rgba(15, 70, 243, 0.45);
+  border-color: rgba(15, 70, 243, 0.35);
+}
+
+/* Gradient wordmark for the second half of the H1. */
+.lp-gradient-text {
+  background: linear-gradient(100deg, #0f46f3 0%, #3b82f6 45%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Travelling highlight used by the badge border and the primary CTA. */
+@keyframes lp-shimmer {
+  0% {
+    background-position: -150% 0;
+  }
+  100% {
+    background-position: 250% 0;
+  }
+}
+.lp-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    100deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.26) 47%,
+    transparent 68%
+  );
+  background-size: 220% 100%;
+  animation: lp-shimmer 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.lp-badge-shimmer {
+  position: relative;
+  background:
+    linear-gradient(var(--lp-card-solid), var(--lp-card-solid)) padding-box,
+    linear-gradient(100deg, var(--lp-line) 25%, rgba(15, 70, 243, 0.55) 50%, var(--lp-line) 75%)
+      border-box;
+  background-size: 100% 100%, 220% 100%;
+  border: 1px solid transparent;
+  animation: lp-shimmer 4.5s linear infinite;
+}
+
+@keyframes lp-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+.lp-float {
+  animation: lp-float 6s ease-in-out infinite;
+}
+
+@keyframes lp-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+.lp-glow-pulse {
+  animation: lp-glow-pulse 5s ease-in-out infinite;
+}
+
+/* The Philippine sun inside the mark gets its own slow warm pulse. */
+@keyframes lp-sun-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.12);
+  }
+}
+.lp-sun-pulse {
+  animation: lp-sun-pulse 4.2s ease-in-out infinite;
+}
+
+/* Three ambient orbs drifting behind the hero. */
+@keyframes lp-orb-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(40px, -30px, 0);
+  }
+}
+@keyframes lp-orb-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-36px, 26px, 0);
+  }
+}
+@keyframes lp-orb-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(24px, 34px, 0);
+  }
+}
+.lp-orb-a {
+  animation: lp-orb-a 18s ease-in-out infinite;
+}
+.lp-orb-b {
+  animation: lp-orb-b 22s ease-in-out infinite;
+}
+.lp-orb-c {
+  animation: lp-orb-c 26s ease-in-out infinite;
+}
+
+@keyframes lp-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+  }
+}
+.lp-dot-pulse {
+  animation: lp-dot-pulse 2.4s ease-out infinite;
+}
+
+/* --------------------------------------------- console (/app) — fixed dark -- */
 
 .eg-root {
   background: #050a18;
@@ -39,7 +242,6 @@
   color-scheme: dark;
 }
 
-/* Layered ambience: two brand-tinted glows over the flat navy canvas. */
 .eg-ambient {
   background:
     radial-gradient(900px 520px at 12% -10%, rgba(30, 144, 255, 0.18), transparent 62%),
@@ -47,7 +249,6 @@
     radial-gradient(620px 420px at 50% 108%, rgba(252, 209, 22, 0.06), transparent 60%);
 }
 
-/* Faint blueprint grid — reads as "system", not as decoration. */
 .eg-grid {
   background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
@@ -63,11 +264,6 @@
   backdrop-filter: blur(12px);
 }
 
-.eg-hairline {
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-/* Top highlight on cards. */
 .eg-sheen {
   position: relative;
 }
@@ -80,29 +276,11 @@
   pointer-events: none;
 }
 
-.eg-glow-blue {
-  box-shadow: 0 0 0 1px rgba(30, 144, 255, 0.25), 0 18px 60px -18px rgba(30, 144, 255, 0.55);
-}
-
 .eg-text-gradient {
   background: linear-gradient(180deg, #ffffff 20%, #9fb6dd 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-}
-
-/* Slow drift for the hero logo — subtle enough to read as depth, not motion. */
-@keyframes eg-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-.eg-float {
-  animation: eg-float 7s ease-in-out infinite;
 }
 
 @keyframes eg-pulse-ring {
@@ -120,7 +298,7 @@
   animation: eg-pulse-ring 2.4s ease-out infinite;
 }
 
-/* Thin scrollbars that match the navy canvas. */
+/* Thin scrollbars for the console panes. */
 .eg-scroll::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -137,8 +315,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .eg-float,
-  .eg-pulse {
-    animation: none !important;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }

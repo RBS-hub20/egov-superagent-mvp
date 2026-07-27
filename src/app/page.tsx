@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { Hero } from "@/components/egov/landing/hero";
-import { ComparisonTable } from "@/components/egov/landing/comparison-table";
-import { PreviewCards } from "@/components/egov/landing/preview-cards";
-import { TrustStrip } from "@/components/egov/landing/trust-strip";
-import { SiteFooter, SiteNav } from "@/components/egov/landing/site-chrome";
+import { BackgroundFx } from "@/components/landing/background-fx";
+import { Hero } from "@/components/landing/hero";
+import { ServicesBento } from "@/components/landing/services-bento";
+import { SiteFooter } from "@/components/landing/site-footer";
+import { SiteNav } from "@/components/landing/site-nav";
+import { TrustReceipt } from "@/components/landing/trust-receipt";
+import { WhySuperAgent } from "@/components/landing/why-superagent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -11,15 +13,18 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   return (
-    <div className="eg-ambient min-h-[100dvh]">
-      <SiteNav />
-      <main>
-        <Hero />
-        <ComparisonTable />
-        <PreviewCards />
-        <TrustStrip />
-      </main>
-      <SiteFooter />
+    <div className="lp-canvas relative min-h-[100dvh] overflow-x-clip">
+      <BackgroundFx />
+      <div className="relative">
+        <SiteNav />
+        <main>
+          <Hero />
+          <WhySuperAgent />
+          <ServicesBento />
+          <TrustReceipt />
+        </main>
+        <SiteFooter />
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/logos/egov-superagent-main.png" alt="eGov SuperAgent" width="420" />
+<img src="public/logo.png" alt="eGov SuperAgent" width="420" />
 
 ### Super Agent. All Services.
 
@@ -19,7 +19,7 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 
 | Route | What it is |
 | --- | --- |
-| `/` | Landing — hero, Agent vs SuperAgent comparison, SSS/PhilHealth/PSA previews, trust pillars |
+| `/` | Landing — light by default with a dark/light toggle: animated hero, Why SuperAgent, services bento, Anti-Fixer Receipt |
 | `/app` | The console — sidebar, chat with generative UI, vault + receipt + memory rail |
 | `/api/webhook/messenger` | `POST` logs the payload and returns `{ ok: true }`; `GET` completes the `hub.challenge` handshake when `MESSENGER_VERIFY_TOKEN` matches |
 
@@ -50,7 +50,9 @@ Deliberately nothing else.
 
 ```
 mocks/                        sss.json, philhealth.json, psa.json — the only data source
-public/logos/                 brand assets (processed) + source/ (original kit exports)
+public/logo.png               primary lockup (transparent) — hero, footer, README
+public/logo-icon.png          SA monogram only — nav, compact chrome
+public/logos/                 favicons + earlier kit exports (source/ holds the originals)
 src/app/
   ├─ page.tsx                 landing
   ├─ app/page.tsx             console
@@ -58,10 +60,12 @@ src/app/
   ├─ layout.tsx               metadata, favicons, OG
   └─ robots.ts, sitemap.ts    generated from NEXT_PUBLIC_SITE_URL
 src/components/
+  ├─ landing/                 nav, hero, why, services bento, trust receipt, footer, background FX
+  ├─ theme/                   ThemeProvider + pill toggle (localStorage 'egov-theme')
   ├─ generative-ui/           SSSContributionsCard, PhilHealthCard, PSATrackerCard, card chrome, sketch map
   ├─ vault/                   VaultPreview — encrypt / list / decrypt / delete
   ├─ receipts/                AntiFixerReceipt
-  └─ egov/                    app shell, sidebar, chat panel, composer, memory graph, landing sections
+  └─ egov/                    app shell, sidebar, chat panel, composer, memory graph
 src/lib/                      brand tokens, typed mock access, agent intents, vault crypto, PDF export
 src/middleware.ts             public-path allowlist + baseline security headers
 ```
@@ -74,8 +78,20 @@ Input matching `sss` renders `<SSSContributionsCard>`, `philhealth` renders
 Taglish reply and follow-up chips. Unmatched input gets an honest "hindi ko pa
 kaya 'yan" listing the four connected agencies.
 
-Landing preview cards deep-link a first utos into the console:
+Landing service tiles deep-link a first utos into the console:
 `/app?q=check%20my%20sss%20contributions`.
+
+## Theming
+
+The landing is **light by default** — the brand lockup was drawn for a light
+surface — with a pill toggle in the header. The choice persists in
+`localStorage` under `egov-theme` and is applied by a pre-paint inline script, so
+a returning dark-mode visitor never sees a white flash.
+
+The console at `/app` is deliberately **exempt**: it stays dark in both themes so
+operators get one consistent workspace. Landing tokens live under the Tailwind
+`lp-*` palette; console chrome keeps `egov-*` and the `eg-*` CSS classes, and the
+two never mix.
 
 ## Vault
 
@@ -106,11 +122,11 @@ clicking a row decrypts it back into a download.
 3. Deploy. `vercel.json` pins functions to `sin1` (Singapore), the closest region
    to the Philippines.
 
-### Domain: egovsuperagent.ph
+### Domain: egovsuperagent.online
 
-In **Project → Settings → Domains**, add `egovsuperagent.ph` and
-`www.egovsuperagent.ph`, then set these records at your `.ph` registrar
-(dot.ph / DNS host) and let Vercel issue the certificate:
+In **Project → Settings → Domains**, add `egovsuperagent.online` and
+`www.egovsuperagent.online`, then set these records at your
+domain registrar's DNS and let Vercel issue the certificate:
 
 | Type | Name | Value |
 | --- | --- | --- |

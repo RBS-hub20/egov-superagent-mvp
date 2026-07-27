@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BRAND, PRODUCT, TAGLINE } from "@/lib/brand";
 import { SITE_URL } from "@/lib/site";
+import { THEME_INIT_SCRIPT, ThemeProvider } from "@/components/theme/theme-provider";
 
 const DESCRIPTION =
   "The Autonomous eGov OS for 115M Filipinos. Utusan mo lang — SSS, PhilHealth, Pag-IBIG at PSA in one agent, with a locally encrypted vault and an Anti-Fixer Receipt for every transaction.";
@@ -47,13 +48,24 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: BRAND.bg,
+  // Browser chrome follows the active theme; light is the default surface.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FEFEFF" },
+    { media: "(prefers-color-scheme: dark)", color: BRAND.bg },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body className="eg-root font-sans antialiased">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Applies the stored theme before first paint — no flash of light for
+            a returning dark-mode visitor. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="font-sans antialiased">
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
