@@ -1,0 +1,14 @@
+{
+  "name": "eGov SuperAgent",
+  "short_name": "SuperAgent",
+  "description": "The Autonomous eGov OS for 115M Filipinos. Utusan mo lang.",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#050A18",
+  "theme_color": "#050A18",
+  "lang": "en-PH",
+  "icons": [
+    { "src": "/logos/egov-favicon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/logos/egov-favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
