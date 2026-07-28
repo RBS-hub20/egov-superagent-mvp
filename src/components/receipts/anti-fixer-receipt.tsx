@@ -4,8 +4,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, Check, Copy, ReceiptText, ShieldCheck } from "lucide-react";
 import { RECEIPT, peso, phDate } from "@/lib/data";
+import { shortNameOf, useUser } from "@/lib/user";
+import { LICENSEE } from "@/lib/brand";
 
 export function AntiFixerReceipt() {
+  const user = useUser();
+  const filedFor = shortNameOf(user);
   const [escalated, setEscalated] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -81,7 +85,9 @@ export function AntiFixerReceipt() {
             <span className="shrink-0 font-mono text-lp-body/50 dark:text-lp-dark-muted/70">
               {entry.at}
             </span>
-            <span className="text-lp-body dark:text-lp-dark-muted">{entry.event}</span>
+            <span className="text-lp-body dark:text-lp-dark-muted">
+              {entry.event.replace("{name}", filedFor)}
+            </span>
           </li>
         ))}
       </ol>
@@ -99,6 +105,9 @@ export function AntiFixerReceipt() {
       <p className="mt-2.5 flex items-start gap-1.5 text-[10.5px] leading-snug text-lp-body/60 dark:text-lp-dark-muted/70">
         <ShieldCheck className="mt-px h-3 w-3 shrink-0 text-emerald-500" />
         All actions logged, no fixer. Official fees only — {RECEIPT.paidTo}.
+      </p>
+      <p className="mt-1.5 text-[10px] uppercase tracking-[0.12em] text-lp-body/45 dark:text-lp-dark-muted/60">
+        Powered by {LICENSEE.short} • Official fee only
       </p>
     </section>
   );

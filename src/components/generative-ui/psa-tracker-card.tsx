@@ -8,6 +8,7 @@ import { MockMap } from "./mock-map";
 import { useShare } from "./use-share";
 import { BRAND } from "@/lib/brand";
 import { peso, phDate, psa } from "@/lib/data";
+import { recordHolder, useUser } from "@/lib/user";
 import { cn } from "@/lib/utils";
 
 const TIME_FMT = new Intl.DateTimeFormat("en-PH", {
@@ -17,10 +18,11 @@ const TIME_FMT = new Intl.DateTimeFormat("en-PH", {
 });
 
 export function PSATrackerCard() {
+  const holder = recordHolder(useUser());
   const [busy, setBusy] = useState(false);
   const { share, label: shareLabel } = useShare({
     title: `PSA request ${psa.request.trackingNumber}`,
-    text: `${psa.request.document} for ${psa.request.ownerName} — ready ${phDate(psa.request.etaDate)} at ${psa.pickup.branch}.`,
+    text: `${psa.request.document} for ${holder} — ready ${phDate(psa.request.etaDate)} at ${psa.pickup.branch}.`,
   });
 
   async function handleDownload() {
@@ -30,7 +32,7 @@ export function PSATrackerCard() {
       downloadPsaSlip({
         trackingNumber: psa.request.trackingNumber,
         document: psa.request.document,
-        ownerName: psa.request.ownerName,
+        ownerName: holder,
         etaDate: psa.request.etaDate,
         branch: psa.pickup.branch,
         address: psa.pickup.address,
@@ -48,7 +50,7 @@ export function PSATrackerCard() {
         title={psa.request.document}
         badge="In progress"
         badgeTone="blue"
-        meta={`Tracking ${psa.request.trackingNumber} • ${psa.request.ownerName}`}
+        meta={`Tracking ${psa.request.trackingNumber} • ${holder}`}
         icon={<ScrollText className="h-5 w-5" />}
       />
 

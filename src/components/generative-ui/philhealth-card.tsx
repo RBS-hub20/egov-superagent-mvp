@@ -5,12 +5,14 @@ import { CheckCircle2, Download, HeartPulse, Share2, ShieldCheck, Users } from "
 import { CardActions, CardButton, CardHeader, Field, GenerativeCard } from "./card-shell";
 import { useShare } from "./use-share";
 import { peso, phDate, philHealth } from "@/lib/data";
+import { recordHolder, useUser } from "@/lib/user";
 
 export function PhilHealthCard() {
+  const holder = recordHolder(useUser());
   const [busy, setBusy] = useState(false);
   const { share, label: shareLabel } = useShare({
     title: "PhilHealth — Active",
-    text: `${philHealth.member.name} • ${philHealth.member.philHealthId} • Active with ${philHealth.dependents.length} dependents until ${phDate(
+    text: `${holder} • ${philHealth.member.philHealthId} • Active with ${philHealth.dependents.length} dependents until ${phDate(
       philHealth.member.validUntil
     )}.`,
   });
@@ -19,7 +21,7 @@ export function PhilHealthCard() {
     setBusy(true);
     try {
       const { downloadPhilHealthSummary } = await import("@/lib/pdf");
-      downloadPhilHealthSummary(philHealth);
+      downloadPhilHealthSummary(philHealth, holder);
     } finally {
       setBusy(false);
     }
@@ -32,7 +34,7 @@ export function PhilHealthCard() {
         title="PhilHealth Membership — Active"
         badge={philHealth.member.status}
         badgeTone="green"
-        meta={`${philHealth.member.name} • ${philHealth.member.philHealthId}`}
+        meta={`${holder} • ${philHealth.member.philHealthId}`}
         icon={<HeartPulse className="h-5 w-5" />}
       />
 

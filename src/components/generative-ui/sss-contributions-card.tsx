@@ -5,12 +5,16 @@ import { CalendarClock, Download, PiggyBank, Share2 } from "lucide-react";
 import { CardActions, CardButton, CardHeader, Field, GenerativeCard } from "./card-shell";
 import { useShare } from "./use-share";
 import { peso, phDate, sss } from "@/lib/data";
+import { recordHolder, useUser } from "@/lib/user";
 
 export function SSSContributionsCard() {
+  // Agency records are demo fixtures; label them for whoever is connected
+  // rather than printing the sample citizen's name at someone else's demo.
+  const holder = recordHolder(useUser());
   const [busy, setBusy] = useState(false);
   const { share, label: shareLabel } = useShare({
     title: "SSS Contributions — Up to Date",
-    text: `${sss.member.name} • ${sss.member.sssNumber} • ${sss.totals.postedMonths} months posted, ${peso(
+    text: `${holder} • ${sss.member.sssNumber} • ${sss.totals.postedMonths} months posted, ${peso(
       sss.member.monthlyContribution
     )}/month via ${sss.member.employer}.`,
   });
@@ -20,7 +24,7 @@ export function SSSContributionsCard() {
     try {
       // jsPDF is heavy; only pull it in when the user actually asks for a file.
       const { downloadSssStatement } = await import("@/lib/pdf");
-      downloadSssStatement(sss);
+      downloadSssStatement(sss, holder);
     } finally {
       setBusy(false);
     }
@@ -33,7 +37,7 @@ export function SSSContributionsCard() {
         title="SSS Contributions — Up to Date"
         badge={sss.member.status}
         badgeTone="green"
-        meta={`${sss.member.name} • ${sss.member.sssNumber}`}
+        meta={`${holder} • ${sss.member.sssNumber}`}
         icon={<PiggyBank className="h-5 w-5" />}
       />
 

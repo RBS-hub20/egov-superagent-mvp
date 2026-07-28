@@ -2,23 +2,31 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { BrainCircuit, Lock, Plus, X } from "lucide-react";
+import { BrainCircuit, IdCard, Lock, LogOut, Plus, User as UserIcon, X } from "lucide-react";
 import { ConsoleLogo } from "./console-logo";
-import { AGENCIES, USER } from "@/lib/data";
+import { AGENCIES, memoryFactsFor } from "@/lib/data";
+import { clearUser, initialsOf, useUser } from "@/lib/user";
+import { LICENSEE } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 export function Sidebar({
   onNewConversation,
   onOpenMemory,
   onOpenVault,
+  onConnectId,
   onClose,
 }: {
   onNewConversation: () => void;
   onOpenMemory: () => void;
   onOpenVault: () => void;
+  onConnectId: () => void;
   /** Present only when the sidebar is rendered as a mobile drawer. */
   onClose?: () => void;
 }) {
+  const user = useUser();
+  const initials = initialsOf(user);
+  const factCount = memoryFactsFor(user).length;
+
   return (
     <div className="eg-surface flex h-full w-full flex-col">
       <div className="flex items-start justify-between px-5 pb-4 pt-5">
@@ -95,7 +103,7 @@ export function Sidebar({
             <BrainCircuit className="h-4 w-4 text-lp-primary" />
             Memory
             <span className="ml-auto text-[10px] text-lp-body/55 dark:text-lp-dark-muted/70">
-              4 facts
+              {factCount ? `${factCount} facts` : "Empty"}
             </span>
           </button>
           <button
@@ -111,19 +119,52 @@ export function Sidebar({
           </button>
         </div>
 
+        <p className="mt-4 border-t border-lp-line pt-3 text-[9.5px] uppercase leading-relaxed tracking-[0.14em] text-lp-body/50 dark:border-lp-dark-line dark:text-lp-dark-muted/60">
+          Built by {LICENSEE.name}
+        </p>
+
         <div className="mt-2 flex items-center gap-2.5 rounded-xl border border-lp-line bg-white/70 px-2.5 py-2.5 dark:border-lp-dark-line dark:bg-white/[0.03]">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lp-primary/10 text-[11px] font-bold text-lp-primary ring-1 ring-inset ring-lp-primary/20">
-            {USER.initials}
+          <span
+            className={cn(
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ring-1 ring-inset",
+              user.verified
+                ? "bg-lp-primary/10 text-lp-primary ring-lp-primary/20"
+                : "bg-slate-100 text-lp-body/60 ring-lp-line dark:bg-white/[0.06] dark:text-lp-dark-muted dark:ring-lp-dark-line"
+            )}
+          >
+            {user.verified ? initials : <UserIcon className="h-4 w-4" />}
           </span>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-semibold text-lp-ink dark:text-lp-dark-text">
-              {USER.name}
+              {user.name}
             </p>
             <p className="truncate text-[10.5px] text-lp-body/70 dark:text-lp-dark-muted/80">
-              {USER.role} • {USER.location}
+              {user.verified ? `${user.status} • ${user.location}` : user.status}
             </p>
           </div>
+          {user.verified ? (
+            <button
+              type="button"
+              onClick={clearUser}
+              aria-label="Disconnect this profile"
+              title="Disconnect"
+              className="shrink-0 rounded-md p-1 text-lp-body/45 transition hover:text-lp-red dark:text-lp-dark-muted/70"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
+          ) : null}
         </div>
+
+        {!user.verified ? (
+          <button
+            type="button"
+            onClick={onConnectId}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-lp-primary py-2.5 text-[13px] font-semibold text-white shadow-[0_0_18px_-6px_rgba(15,70,243,0.7)] transition hover:scale-[1.01]"
+          >
+            <IdCard className="h-4 w-4" />
+            Connect ID
+          </button>
+        ) : null}
       </div>
     </div>
   );

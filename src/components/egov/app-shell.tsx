@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu } from "lucide-react";
 import { ChatPanel } from "./chat-panel";
+import { ConnectIdModal } from "./connect-id-modal";
 import { ConsoleLogo } from "./console-logo";
 import { InsightRail } from "./insight-rail";
 import { Sidebar } from "./sidebar";
@@ -13,6 +14,13 @@ export function AppShell() {
   const [conversationKey, setConversationKey] = useState(0);
   const [navOpen, setNavOpen] = useState(false);
   const [railOpen, setRailOpen] = useState(false);
+  const [connectOpen, setConnectOpen] = useState(false);
+
+  function openConnect() {
+    setNavOpen(false);
+    setRailOpen(false);
+    setConnectOpen(true);
+  }
 
   function newConversation() {
     setConversationKey((k) => k + 1);
@@ -45,12 +53,17 @@ export function AppShell() {
             onNewConversation={newConversation}
             onOpenMemory={() => setRailOpen(true)}
             onOpenVault={() => setRailOpen(true)}
+            onConnectId={openConnect}
           />
         </motion.aside>
 
         <main className="eg-ambient min-w-0 flex-1">
           <Suspense fallback={null}>
-            <ChatPanel key={conversationKey} onOpenRail={() => setRailOpen(true)} />
+            <ChatPanel
+              key={conversationKey}
+              onOpenRail={() => setRailOpen(true)}
+              onConnectId={openConnect}
+            />
           </Suspense>
         </main>
 
@@ -60,7 +73,7 @@ export function AppShell() {
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           className="hidden w-[320px] shrink-0 border-l border-lp-line dark:border-lp-dark-line xl:block"
         >
-          <InsightRail />
+          <InsightRail onConnectId={openConnect} />
         </motion.aside>
       </div>
 
@@ -96,6 +109,7 @@ export function AppShell() {
                   setNavOpen(false);
                   setRailOpen(true);
                 }}
+                onConnectId={openConnect}
                 onClose={() => setNavOpen(false)}
               />
             </motion.div>
@@ -127,7 +141,7 @@ export function AppShell() {
               transition={{ type: "spring", stiffness: 300, damping: 34 }}
               className="absolute inset-x-0 bottom-0 h-[86dvh] overflow-hidden rounded-t-3xl border-t border-lp-line shadow-2xl dark:border-lp-dark-line sm:hidden"
             >
-              <InsightRail onClose={() => setRailOpen(false)} variant="sheet" />
+              <InsightRail onClose={() => setRailOpen(false)} onConnectId={openConnect} variant="sheet" />
             </motion.div>
 
             {/* Tablet: side drawer */}
@@ -138,11 +152,13 @@ export function AppShell() {
               transition={{ type: "spring", stiffness: 320, damping: 34 }}
               className="absolute inset-y-0 right-0 hidden w-[min(340px,88vw)] border-l border-lp-line shadow-2xl dark:border-lp-dark-line sm:block"
             >
-              <InsightRail onClose={() => setRailOpen(false)} />
+              <InsightRail onClose={() => setRailOpen(false)} onConnectId={openConnect} />
             </motion.div>
           </motion.div>
         ) : null}
       </AnimatePresence>
+
+      <ConnectIdModal open={connectOpen} onClose={() => setConnectOpen(false)} />
     </div>
   );
 }

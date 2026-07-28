@@ -12,9 +12,11 @@ import { MemoryGraph } from "./memory-graph";
  */
 export function InsightRail({
   onClose,
+  onConnectId,
   variant = "rail",
 }: {
   onClose?: () => void;
+  onConnectId?: () => void;
   variant?: "rail" | "sheet";
 }) {
   return (
@@ -44,7 +46,7 @@ export function InsightRail({
       <div className="flex-1 space-y-3 overflow-y-auto p-4 eg-scroll">
         <VaultPreview />
         <AntiFixerReceipt />
-        <MemoryGraph />
+        <MemoryGraph onConnectId={onConnectId} />
       </div>
     </div>
   );

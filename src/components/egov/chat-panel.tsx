@@ -4,13 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { PanelRight, Sparkles } from "lucide-react";
+import { IdCard, PanelRight, Sparkles, User as UserIcon } from "lucide-react";
 import { Composer } from "./composer";
 import { ProactiveBanner } from "./proactive-banner";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { PhilHealthCard, PSATrackerCard, SSSContributionsCard } from "@/components/generative-ui";
 import { respond, type CardKind } from "@/lib/agent";
-import { USER, peso, phDate, sss } from "@/lib/data";
+import { peso, phDate, sss } from "@/lib/data";
+import { initialsOf, useUser } from "@/lib/user";
 
 interface Message {
   id: string;
@@ -73,7 +74,14 @@ function Working({ agencies }: { agencies: string[] }) {
   );
 }
 
-export function ChatPanel({ onOpenRail }: { onOpenRail: () => void }) {
+export function ChatPanel({
+  onOpenRail,
+  onConnectId,
+}: {
+  onOpenRail: () => void;
+  onConnectId: () => void;
+}) {
+  const user = useUser();
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [working, setWorking] = useState<string[] | null>(null);
   const [bannerVisible, setBannerVisible] = useState(true);
@@ -170,11 +178,24 @@ export function ChatPanel({ onOpenRail }: { onOpenRail: () => void }) {
           </h1>
           <p className="mt-0.5 inline-flex items-center gap-1.5 rounded-full border border-lp-line bg-white/70 px-2.5 py-0.5 text-[11px] text-lp-body dark:border-lp-dark-line dark:bg-white/[0.04] dark:text-lp-dark-muted">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 eg-pulse" aria-hidden />
-            <span className="truncate">4 agencies connected — acting for {USER.name}</span>
+            <span className="truncate">
+              4 agencies connected —{" "}
+              {user.verified ? `acting for ${user.name}` : "Guest mode — connect ID"}
+            </span>
           </p>
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
+          {!user.verified ? (
+            <button
+              type="button"
+              onClick={onConnectId}
+              className="hidden items-center gap-1.5 rounded-lg bg-lp-primary px-3 py-1.5 text-[12px] font-semibold text-white transition hover:scale-[1.02] sm:inline-flex"
+            >
+              <IdCard className="h-3.5 w-3.5" />
+              Connect ID
+            </button>
+          ) : null}
           <ThemeToggle />
           <button
             type="button"
@@ -239,7 +260,7 @@ export function ChatPanel({ onOpenRail }: { onOpenRail: () => void }) {
                   {m.text}
                 </div>
                 <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-lp-primary/10 text-[11px] font-bold text-lp-primary ring-1 ring-inset ring-lp-primary/20">
-                  {USER.initials}
+                  {user.verified ? initialsOf(user) : <UserIcon className="h-4 w-4" />}
                 </span>
               </motion.div>
             )

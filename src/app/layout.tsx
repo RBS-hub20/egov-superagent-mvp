@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { BRAND, PRODUCT, TAGLINE } from "@/lib/brand";
+import { BRAND, LICENSEE, PRODUCT, TAGLINE } from "@/lib/brand";
 import { SITE_URL } from "@/lib/site";
 import { THEME_INIT_SCRIPT, ThemeProvider } from "@/components/theme/theme-provider";
 
@@ -15,6 +15,10 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   applicationName: PRODUCT,
+  // Emits <meta name="author"> — the licensed operator of this build.
+  authors: [{ name: LICENSEE.name }],
+  creator: LICENSEE.name,
+  publisher: LICENSEE.name,
   manifest: "/site.webmanifest",
   icons: {
     icon: [

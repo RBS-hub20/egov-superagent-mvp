@@ -70,14 +70,14 @@ function keyValueBlock(doc: jsPDF, rows: [string, string][], startY: number) {
 }
 
 /** Contribution statement matching the SSS card shown in chat. */
-export function downloadSssStatement(record: SssRecord) {
+export function downloadSssStatement(record: SssRecord, holderName = record.member.name) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   header(doc, "SSS Contribution Record", `Tracking EGOV-2026-8891 • ${record.member.status}`);
 
   const afterKv = keyValueBlock(
     doc,
     [
-      ["Member", record.member.name],
+      ["Member", holderName],
       ["SSS number", record.member.sssNumber],
       ["Membership", record.member.membershipType],
       ["Employer", record.member.employer],
@@ -121,14 +121,14 @@ export function downloadSssStatement(record: SssRecord) {
 }
 
 /** Membership summary matching the PhilHealth card shown in chat. */
-export function downloadPhilHealthSummary(record: PhilHealthRecord) {
+export function downloadPhilHealthSummary(record: PhilHealthRecord, holderName = record.member.name) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   header(doc, "PhilHealth Membership", `${record.member.status} until ${phDate(record.member.validUntil)}`);
 
   const afterKv = keyValueBlock(
     doc,
     [
-      ["Member", record.member.name],
+      ["Member", holderName],
       ["PhilHealth ID", record.member.philHealthId],
       ["Category", record.member.category],
       ["Employer", record.member.employer],

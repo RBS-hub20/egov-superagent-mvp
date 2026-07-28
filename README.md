@@ -67,6 +67,7 @@ src/components/
   ├─ receipts/                AntiFixerReceipt
   └─ egov/                    app shell, sidebar, chat panel, composer, memory graph
 src/lib/                      brand tokens, typed mock access, agent intents, vault crypto, PDF export
+src/lib/user.ts               guest-by-default identity store (localStorage 'egov-user')
 src/middleware.ts             public-path allowlist + baseline security headers
 ```
 
@@ -96,6 +97,21 @@ bits (solid panels, scrollbars, receipt glow) and inherit those same variables.
 One deliberate exception: the generative-UI cards stay white in both themes.
 Anything on a white document surface is an agency record you can download or
 show at a counter — that meaning would be lost if it followed the theme.
+
+## Identity
+
+There is no account system, so identity lives in the browser and starts empty:
+a fresh visitor is **Guest User — Connect PhilSys ID**. Nothing is claimed about
+them, the memory graph is empty, and agency cards are labelled "Demo record"
+rather than printing the sample citizen's name at somebody else's demo.
+
+"Connect ID" asks for a name and optionally an ID document, which goes straight
+into the encrypted vault. From then on the sidebar, the chat header, the memory
+graph, the receipt audit trail, the agency cards and the generated PDFs all use
+that name. Disconnecting returns everything to guest.
+
+The name is typed, not read off the ID — there is no OCR in this build, and a
+wrong guess from an image would be worse than asking.
 
 ## Vault
 
@@ -142,6 +158,12 @@ differ from the defaults above. Pick one host as primary (apex is the
 conventional choice here) and let Vercel redirect the other. Once the domain
 resolves, `robots.txt`, `sitemap.xml` and every OG URL follow it automatically
 through `SITE_URL`.
+
+## Licensing
+
+Built by **AXLA SOFTWARE DEVELOPMENT SERVICES** — Licensed eGov Solutions
+Provider. The attribution appears in the landing footer, the console sidebar,
+the Anti-Fixer Receipt, and as `<meta name="author">`.
 
 ## Scope
 

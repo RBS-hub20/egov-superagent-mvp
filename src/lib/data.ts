@@ -96,16 +96,6 @@ export const sss = sssJson as SssRecord;
 export const philHealth = philHealthJson as PhilHealthRecord;
 export const psa = psaJson as PsaRecord;
 
-/** The signed-in Filipino this MVP demos for. */
-export const USER = {
-  name: "Renmar Sombilon",
-  initials: "RS",
-  role: "Verified PhilSys holder",
-  philSysMasked: "****1234",
-  employer: "RBS Labs Inc.",
-  location: "Cebu City",
-} as const;
-
 export interface Agency {
   id: "sss" | "philhealth" | "pagibig" | "psa";
   name: string;
@@ -121,13 +111,49 @@ export const AGENCIES: Agency[] = [
   { id: "psa", name: "PSA", full: "Philippine Statistics Authority", connected: true, detail: "Birth, marriage, CENOMAR" },
 ];
 
-/** Facts the agent has learned and reuses without asking again. */
-export const MEMORY_FACTS = [
-  { label: "PhilSys ID", value: "****1234", detail: "Verified 12 Mar 2026" },
-  { label: "Employed at", value: "RBS Labs Inc.", detail: "Since Jan 2015 — employer files monthly" },
-  { label: "SSS contribution", value: "P1,350/mo", detail: "Auto-checked every payday" },
-  { label: "Home branch", value: "PSA Serbilis — SM City Cebu", detail: "Nearest releasing counter" },
-] as const;
+export interface MemoryFact {
+  label: string;
+  value: string;
+  detail: string;
+}
+
+/**
+ * Facts the agent has learned and reuses without asking again.
+ *
+ * Built from the connected profile, so a visitor who has not connected an ID
+ * sees an empty graph instead of somebody else's life.
+ */
+export function memoryFactsFor(user: {
+  name: string;
+  verified: boolean;
+  location: string;
+  philSysMasked?: string;
+  employer?: string;
+}): MemoryFact[] {
+  if (!user.verified) return [];
+  return [
+    {
+      label: "PhilSys ID",
+      value: user.philSysMasked ?? "Not yet linked",
+      detail: user.philSysMasked ? "Read from the ID in your vault" : "Add an ID to the vault to link it",
+    },
+    {
+      label: "Employed at",
+      value: user.employer ?? sss.member.employer,
+      detail: "Employer files your contributions monthly",
+    },
+    {
+      label: "SSS contribution",
+      value: `${peso(sss.member.monthlyContribution)}/mo`,
+      detail: "Auto-checked every payday",
+    },
+    {
+      label: "Home branch",
+      value: psa.pickup.branch,
+      detail: `Nearest releasing counter • ${user.location}`,
+    },
+  ];
+}
 
 /** The Anti-Fixer Receipt tracked in the right rail. */
 export const RECEIPT = {
@@ -140,9 +166,10 @@ export const RECEIPT = {
   progress: 60,
   stage: "Verifying",
   officialFee: 365,
-  paidTo: "PSA (GCash reference PSA-SECPA-8891-RS)",
+  paidTo: "PSA (GCash reference PSA-SECPA-8891)",
   auditTrail: [
-    { at: "09:12", event: "Request filed by SuperAgent on behalf of Renmar S." },
+    // {name} is filled in at render time from the connected profile.
+    { at: "09:12", event: "Request filed by SuperAgent on behalf of {name}" },
     { at: "09:13", event: "Official fee P365 paid — no service charge, no fixer" },
     { at: "14:40", event: "PSA Civil Registry began record verification" },
   ],

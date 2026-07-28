@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { TAGLINE } from "@/lib/brand";
+import { LICENSEE, TAGLINE } from "@/lib/brand";
 
 export function SiteFooter() {
   return (
@@ -53,7 +53,13 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="mx-auto mt-12 max-w-6xl border-t border-lp-line pt-6 text-[12.5px] text-lp-body/70 dark:border-lp-dark-line dark:text-lp-dark-muted/70">
+      <p className="mx-auto mt-8 max-w-6xl text-[12px] text-lp-body/60 dark:text-lp-dark-muted/70">
+        Built by{" "}
+        <span className="font-bold text-lp-ink dark:text-lp-dark-text">{LICENSEE.name}</span> •{" "}
+        {LICENSEE.role}
+      </p>
+
+      <div className="mx-auto mt-6 max-w-6xl border-t border-lp-line pt-6 text-[12.5px] text-lp-body/70 dark:border-lp-dark-line dark:text-lp-dark-muted/70">
         © {new Date().getFullYear()} RBS Labs Inc. Mock data only — walang fixer, walang
         dagdag-bayad.
       </div>
