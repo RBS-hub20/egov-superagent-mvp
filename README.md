@@ -19,7 +19,9 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 
 | Route | What it is |
 | --- | --- |
-| `/` | Landing — light by default with a dark/light toggle: animated hero, Why SuperAgent, services bento, Anti-Fixer Receipt |
+| `/` | Intro — three auto-advancing slides, Sign Up Free / Login. Always white; a returning visitor is sent to `/app` |
+| `/product` | Marketing landing — hero, Why SuperAgent, services bento, Anti-Fixer Receipt (light/dark) |
+| `/app/signup`, `/app/login` | Phone or email, one-time code |
 | `/onboarding` | First-run intro — three swipeable slides, shown once per browser |
 | `/app` | The console — same theme as the landing: sidebar, chat with generative UI, vault + receipt + memory rail |
 | `/admin` | Owner console — eTravel queue, Bayad Center, PSA deliveries, logs, settings. Password-gated |
@@ -160,16 +162,24 @@ against the Bureau of Immigration, and `/verify` says so next to the filed
 badge. No payment processor is connected; the Bayad Center's payment column is
 demo data.
 
-## First run
+## First run and accounts
 
-A visitor who has not seen the console is sent to `/onboarding` — three slides
-covering how to ask, how the vault keeps the key on their device, and why the
-receipt makes a fixer pointless. Swipe, arrow keys, the dots or the button all
-page through; Skip and "Login here" jump straight in.
+`/` is the intro: three slides that advance on their own every six seconds and
+stop the moment you swipe, tap a dot or use the arrow keys. It is always white —
+it sits beside government apps on a first-time visitor's phone. Sign Up Free and
+Login both set `egov-onboarded`, so every later visit opens `/app` directly.
+`/onboarding` redirects here for old links.
 
-Finishing sets `egov-onboarded` in localStorage and every later visit opens
-`/app` directly. A deep link survives the detour: `/app?q=…` becomes
-`/onboarding?next=…` and the prompt still runs once the console opens.
+Sign-up takes a phone number or email and a one-time code:
+
+- **With Supabase configured** (`NEXT_PUBLIC_SUPABASE_URL` and
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`), the code is sent and verified by Supabase.
+  This path is wiring, not tested behaviour — no project is attached yet.
+- **Without it (this build)**, a local mock accepts `123456`, says so on screen,
+  and creates a profile in this browser. No account exists anywhere.
+
+Either way the profile lands in the same `egov-user` store, so the console
+greets a verified member instead of a guest.
 
 ## Identity
 

@@ -12,8 +12,8 @@ import { isOnboarded } from "@/lib/onboarding";
  * Until it resolves we render a branded splash rather than the console — a
  * flash of the full three-column app followed by a redirect looks broken.
  *
- * The current path and query ride along as `next`, so a deep link like
- * /app?q=check my sss contributions still lands correctly after the intro.
+ * The intro lives at / and sends people on to sign-up, so there is no `next`
+ * to carry: a first-time visitor is choosing an account, not resuming a task.
  */
 export function OnboardingGate({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -24,8 +24,7 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
       setReady(true);
       return;
     }
-    const next = `${window.location.pathname}${window.location.search}`;
-    router.replace(`/onboarding?next=${encodeURIComponent(next)}`);
+    router.replace("/");
   }, [router]);
 
   if (!ready) {

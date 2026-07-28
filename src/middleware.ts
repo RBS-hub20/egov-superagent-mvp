@@ -12,9 +12,12 @@ import { ADMIN_COOKIE, isValidAdminCookie } from "@/lib/admin-auth";
  * against before redirecting.
  */
 const PUBLIC_PATHS = new Set([
-  "/", // landing
-  "/onboarding", // first-run intro
+  "/", // intro carousel
+  "/product", // marketing landing
+  "/onboarding", // legacy intro path, redirects to /
   "/app", // SuperAgent console
+  "/app/signup",
+  "/app/login",
 ]);
 
 const PUBLIC_PREFIXES = [

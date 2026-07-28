@@ -1,19 +1,6 @@
-import { Suspense } from "react";
-import type { Metadata } from "next";
-import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Get started",
-  description:
-    "Three things to know before you hand SuperAgent an errand: how to ask, how your ID stays yours, and why no fixer is ever needed.",
-  // A first-run gate has nothing useful to rank; keep it out of the index.
-  robots: { index: false, follow: true },
-};
-
-export default function OnboardingPage() {
-  return (
-    <Suspense fallback={null}>
-      <OnboardingFlow />
-    </Suspense>
-  );
+// The three-slide intro moved to / when sign-up was added; keep old links alive.
+export default function OnboardingRedirect() {
+  redirect("/");
 }
