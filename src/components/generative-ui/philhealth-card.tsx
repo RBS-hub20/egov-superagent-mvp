@@ -42,7 +42,7 @@ export function PhilHealthCard() {
         <Field label="Premium" value={`${peso(philHealth.member.monthlyPremium)}/mo`} />
         <Field
           label="Valid until"
-          value={<span className="text-egov-navy">{phDate(philHealth.member.validUntil)}</span>}
+          value={<span className="text-lp-primary">{phDate(philHealth.member.validUntil)}</span>}
         />
       </dl>
 

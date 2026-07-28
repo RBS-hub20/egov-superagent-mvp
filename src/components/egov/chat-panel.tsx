@@ -7,11 +7,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PanelRight, Sparkles } from "lucide-react";
 import { Composer } from "./composer";
 import { ProactiveBanner } from "./proactive-banner";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { PhilHealthCard, PSATrackerCard, SSSContributionsCard } from "@/components/generative-ui";
-import { LOGOS } from "@/lib/brand";
 import { respond, type CardKind } from "@/lib/agent";
 import { USER, peso, phDate, sss } from "@/lib/data";
-import { cn } from "@/lib/utils";
 
 interface Message {
   id: string;
@@ -34,8 +33,8 @@ const nextId = () => `m${++counter}-${Date.now().toString(36)}`;
 
 function AgentAvatar() {
   return (
-    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-egov-navy/60">
-      <Image src={LOGOS.markWhite} alt="" width={40} height={26} className="h-4 w-auto" />
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-lp-line bg-white dark:border-lp-dark-line dark:bg-white/[0.06]">
+      <Image src="/logo-icon.png" alt="" width={64} height={39} className="h-4 w-auto" />
     </span>
   );
 }
@@ -48,9 +47,7 @@ function CardFor({ kind }: { kind: CardKind }) {
 }
 
 function Working({ agencies }: { agencies: string[] }) {
-  const label = agencies.length
-    ? `Kinakausap ko ang ${agencies.join(", ")}…`
-    : "Iniisip ko pa…";
+  const label = agencies.length ? `Kinakausap ko ang ${agencies.join(", ")}…` : "Iniisip ko pa…";
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -59,18 +56,18 @@ function Working({ agencies }: { agencies: string[] }) {
       className="flex items-center gap-3"
     >
       <AgentAvatar />
-      <div className="flex items-center gap-2.5 rounded-2xl rounded-tl-sm border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5">
+      <div className="flex items-center gap-2.5 rounded-2xl rounded-tl-sm border border-lp-line border-l-2 border-l-lp-primary bg-white px-3.5 py-2.5 dark:border-lp-dark-line dark:border-l-lp-primary dark:bg-lp-dark-card">
         <span className="flex gap-1">
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
-              className="h-1.5 w-1.5 rounded-full bg-egov-action"
+              className="h-1.5 w-1.5 rounded-full bg-lp-primary"
               animate={{ opacity: [0.25, 1, 0.25] }}
               transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.16 }}
             />
           ))}
         </span>
-        <span className="text-[12.5px] text-white/55">{label}</span>
+        <span className="text-[12.5px] text-lp-body dark:text-lp-dark-muted">{label}</span>
       </div>
     </motion.div>
   );
@@ -98,23 +95,26 @@ export function ChatPanel({ onOpenRail }: { onOpenRail: () => void }) {
     setMessages((prev) => [...prev, { id: nextId(), role: "user", text, card: null }]);
     setWorking(turn.working);
 
-    const t = setTimeout(() => {
-      setWorking(null);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: nextId(),
-          role: "agent",
-          text: turn.reply,
-          card: turn.card,
-          suggestions: turn.suggestions,
-        },
-      ]);
-    }, turn.card ? 900 : 600);
+    const t = setTimeout(
+      () => {
+        setWorking(null);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: nextId(),
+            role: "agent",
+            text: turn.reply,
+            card: turn.card,
+            suggestions: turn.suggestions,
+          },
+        ]);
+      },
+      turn.card ? 900 : 600
+    );
     timers.current.push(t);
   }, []);
 
-  // A preview card on the landing page can deep-link a first utos: /app?q=…
+  // A service tile on the landing page can deep-link a first utos: /app?q=…
   useEffect(() => {
     const q = searchParams?.get("q");
     if (!q || seededQuery.current) return;
@@ -163,22 +163,30 @@ export function ChatPanel({ onOpenRail }: { onOpenRail: () => void }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="flex items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3 sm:px-6">
+      <header className="flex items-center justify-between gap-3 border-b border-lp-line px-4 py-3 dark:border-lp-dark-line sm:px-6">
         <div className="min-w-0">
-          <h1 className="truncate text-[14px] font-semibold text-white">SuperAgent</h1>
-          <p className="truncate text-[11px] text-white/40">
-            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-egov-green align-middle" />
-            4 agencies connected • acting for {USER.name}
+          <h1 className="truncate text-[14px] font-bold text-lp-ink dark:text-lp-dark-text">
+            SuperAgent
+          </h1>
+          <p className="mt-0.5 inline-flex items-center gap-1.5 rounded-full border border-lp-line bg-white/70 px-2.5 py-0.5 text-[11px] text-lp-body dark:border-lp-dark-line dark:bg-white/[0.04] dark:text-lp-dark-muted">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 eg-pulse" aria-hidden />
+            <span className="truncate">4 agencies connected — acting for {USER.name}</span>
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onOpenRail}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-[12px] text-white/65 transition hover:bg-white/5 hover:text-white xl:hidden"
-        >
-          <PanelRight className="h-3.5 w-3.5" />
-          Vault &amp; receipt
-        </button>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={onOpenRail}
+            // The label is hidden on phones, so the button needs its own name.
+            aria-label="Open vault and receipt"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-lp-line px-2.5 py-1.5 text-[12px] font-medium text-lp-body transition hover:border-lp-primary/40 hover:text-lp-ink dark:border-lp-dark-line dark:text-lp-dark-muted dark:hover:text-lp-dark-text xl:hidden"
+          >
+            <PanelRight className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Vault &amp; receipt</span>
+          </button>
+        </div>
       </header>
 
       <ProactiveBanner visible={bannerVisible} onConfirm={confirmPayment} onDefer={deferPayment} />
@@ -189,14 +197,16 @@ export function ChatPanel({ onOpenRail }: { onOpenRail: () => void }) {
             m.role === "agent" ? (
               <motion.div
                 key={m.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="flex gap-3"
               >
                 <AgentAvatar />
                 <div className="min-w-0 flex-1 space-y-3">
-                  <div className="inline-block rounded-2xl rounded-tl-sm border border-white/[0.07] bg-white/[0.035] px-4 py-3 text-[14.5px] leading-relaxed text-white/85">
+                  {/* Blue left border marks the agent's own voice; anything on a
+                      white document card below is an agency record. */}
+                  <div className="inline-block rounded-2xl rounded-tl-sm border border-lp-line border-l-2 border-l-lp-primary bg-white px-4 py-3 text-[14.5px] leading-relaxed text-lp-ink shadow-[0_1px_2px_rgba(10,25,49,0.04)] dark:border-lp-dark-line dark:border-l-lp-primary dark:bg-lp-dark-card dark:text-lp-dark-text">
                     {m.text}
                   </div>
                   {m.card ? <CardFor kind={m.card} /> : null}
@@ -207,9 +217,9 @@ export function ChatPanel({ onOpenRail }: { onOpenRail: () => void }) {
                           key={s}
                           type="button"
                           onClick={() => send(s)}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[12px] text-white/60 transition hover:border-egov-action/50 hover:bg-egov-action/10 hover:text-white"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-lp-line bg-white px-3 py-1.5 text-[12px] font-medium text-lp-body transition hover:border-lp-primary/50 hover:bg-lp-primary/[0.06] hover:text-lp-primary dark:border-lp-dark-line dark:bg-white/[0.04] dark:text-lp-dark-muted dark:hover:bg-lp-primary/15 dark:hover:text-lp-dark-text"
                         >
-                          <Sparkles className="h-3 w-3 text-egov-action" />
+                          <Sparkles className="h-3 w-3 text-lp-primary" />
                           {s}
                         </button>
                       ))}
@@ -220,20 +230,15 @@ export function ChatPanel({ onOpenRail }: { onOpenRail: () => void }) {
             ) : (
               <motion.div
                 key={m.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.32 }}
                 className="flex justify-end gap-3"
               >
-                <div
-                  className={cn(
-                    "max-w-[85%] rounded-2xl rounded-br-sm bg-egov-action px-4 py-2.5 text-[14.5px] leading-relaxed text-white",
-                    "shadow-[0_10px_30px_-12px_rgba(30,144,255,0.8)]"
-                  )}
-                >
+                <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-lp-primary px-4 py-2.5 text-[14.5px] leading-relaxed text-white shadow-[0_10px_30px_-14px_rgba(15,70,243,0.8)]">
                   {m.text}
                 </div>
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] text-[11px] font-semibold text-white/70">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-lp-primary/10 text-[11px] font-bold text-lp-primary ring-1 ring-inset ring-lp-primary/20">
                   {USER.initials}
                 </span>
               </motion.div>

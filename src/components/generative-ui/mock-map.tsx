@@ -62,10 +62,10 @@ export function MockMap({
       {/* Pin */}
       <div className="absolute left-[62%] top-[38%] -translate-x-1/2 -translate-y-full">
         <span className="relative flex flex-col items-center">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-egov-red text-white shadow-lg shadow-black/25">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-lp-red text-white shadow-lg shadow-black/25">
             <MapPin className="h-4 w-4" />
           </span>
-          <span className="mt-0.5 h-2 w-2 rotate-45 bg-egov-red" />
+          <span className="mt-0.5 h-2 w-2 rotate-45 bg-lp-red" />
         </span>
       </div>
 

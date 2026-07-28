@@ -23,7 +23,11 @@ export function GenerativeCard({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "w-full overflow-hidden rounded-2xl bg-white text-[#0B1220] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)] ring-1 ring-black/5",
+        // Always a white "document" surface in both themes — anything on white
+        // is an agency record. Only the lift changes: a soft shadow on the
+        // light canvas, a heavier one to separate it from the dark canvas.
+        "w-full overflow-hidden rounded-2xl bg-white text-[#0B1220] ring-1 ring-black/[0.07]",
+        "shadow-[0_16px_40px_-24px_rgba(10,25,49,0.35)] dark:shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]",
         className
       )}
     >
@@ -57,7 +61,7 @@ export function CardHeader({
     <header className="flex flex-wrap items-start justify-between gap-3 border-b border-black/[0.07] px-5 py-4 sm:px-6">
       <div className="flex items-start gap-3">
         {icon ? (
-          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-egov-navy/10 text-egov-navy">
+          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-lp-primary/10 text-lp-primary">
             {icon}
           </span>
         ) : null}
@@ -111,9 +115,9 @@ export function CardButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-[13px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-egov-action focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-[13px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lp-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
         variant === "primary"
-          ? "bg-egov-action text-white hover:bg-[#1878d8]"
+          ? "bg-lp-primary text-white hover:bg-[#0b39c8]"
           : "border border-black/10 bg-white text-black/70 hover:bg-black/[0.04]"
       )}
     >

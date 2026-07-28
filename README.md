@@ -20,7 +20,7 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 | Route | What it is |
 | --- | --- |
 | `/` | Landing — light by default with a dark/light toggle: animated hero, Why SuperAgent, services bento, Anti-Fixer Receipt |
-| `/app` | The console — sidebar, chat with generative UI, vault + receipt + memory rail |
+| `/app` | The console — same theme as the landing: sidebar, chat with generative UI, vault + receipt + memory rail |
 | `/api/webhook/messenger` | `POST` logs the payload and returns `{ ok: true }`; `GET` completes the `hub.challenge` handshake when `MESSENGER_VERIFY_TOKEN` matches |
 
 ## Run it
@@ -88,10 +88,14 @@ surface — with a pill toggle in the header. The choice persists in
 `localStorage` under `egov-theme` and is applied by a pre-paint inline script, so
 a returning dark-mode visitor never sees a white flash.
 
-The console at `/app` is deliberately **exempt**: it stays dark in both themes so
-operators get one consistent workspace. Landing tokens live under the Tailwind
-`lp-*` palette; console chrome keeps `egov-*` and the `eg-*` CSS classes, and the
-two never mix.
+The console at `/app` follows the same toggle, so walking from the landing into
+the app never changes the furniture. Both surfaces read the same `lp-*` Tailwind
+palette and CSS variables; `eg-*` classes carry only the console's structural
+bits (solid panels, scrollbars, receipt glow) and inherit those same variables.
+
+One deliberate exception: the generative-UI cards stay white in both themes.
+Anything on a white document surface is an agency record you can download or
+show at a counter — that meaning would be lost if it followed the theme.
 
 ## Vault
 

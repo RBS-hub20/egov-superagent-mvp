@@ -74,7 +74,7 @@ export function SSSContributionsCard() {
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.07] px-5 py-3.5 sm:px-6">
         <p className="inline-flex items-center gap-2 text-[13px] text-black/60">
-          <CalendarClock className="h-4 w-4 text-egov-action" />
+          <CalendarClock className="h-4 w-4 text-lp-primary" />
           Next due: <span className="font-semibold text-black/85">{sss.nextDue.period}</span> —{" "}
           {peso(sss.nextDue.amount)} on {phDate(sss.nextDue.dueDate)} via {sss.nextDue.channel}
         </p>

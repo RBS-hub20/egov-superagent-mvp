@@ -234,68 +234,61 @@
   animation: lp-dot-pulse 2.4s ease-out infinite;
 }
 
-/* --------------------------------------------- console (/app) — fixed dark -- */
+/* ------------------------------------------- console (/app) — same theme -- */
 
-.eg-root {
-  background: #050a18;
-  color: #e6ecf7;
-  color-scheme: dark;
+/* The console shares the landing's tokens, so the toggle moves both surfaces
+   together. Solid (not translucent) panels here: chat content scrolls behind
+   the sidebar and rail, and a frosted panel would smear it. */
+.eg-panel {
+  background: var(--lp-card-solid);
+  border: 1px solid var(--lp-line);
+  transition: background-color 0.4s ease, border-color 0.4s ease;
 }
 
+.eg-surface {
+  background: var(--lp-card-solid);
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Faint working-surface tint behind the chat column. */
 .eg-ambient {
   background:
-    radial-gradient(900px 520px at 12% -10%, rgba(30, 144, 255, 0.18), transparent 62%),
-    radial-gradient(760px 460px at 88% 4%, rgba(10, 33, 86, 0.75), transparent 64%),
-    radial-gradient(620px 420px at 50% 108%, rgba(252, 209, 22, 0.06), transparent 60%);
+    radial-gradient(760px 460px at 12% -10%, rgba(15, 70, 243, 0.07), transparent 62%),
+    radial-gradient(620px 420px at 92% 6%, rgba(255, 199, 0, 0.05), transparent 64%);
 }
-
-.eg-grid {
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(circle at 50% 0%, black, transparent 72%);
-  -webkit-mask-image: radial-gradient(circle at 50% 0%, black, transparent 72%);
-}
-
-.eg-panel {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-}
-
-.eg-sheen {
-  position: relative;
-}
-.eg-sheen::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-  pointer-events: none;
-}
-
-.eg-text-gradient {
-  background: linear-gradient(180deg, #ffffff 20%, #9fb6dd 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+:root.dark .eg-ambient {
+  background:
+    radial-gradient(760px 460px at 12% -10%, rgba(59, 130, 246, 0.16), transparent 62%),
+    radial-gradient(620px 420px at 92% 6%, rgba(15, 70, 243, 0.14), transparent 64%);
 }
 
 @keyframes eg-pulse-ring {
   0% {
-    box-shadow: 0 0 0 0 rgba(32, 201, 151, 0.45);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
   }
   70% {
-    box-shadow: 0 0 0 6px rgba(32, 201, 151, 0);
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(32, 201, 151, 0);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }
 .eg-pulse {
   animation: eg-pulse-ring 2.4s ease-out infinite;
+}
+
+/* The live receipt breathes so it reads as in-progress, not a static record. */
+@keyframes eg-receipt-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(15, 70, 243, 0);
+  }
+  50% {
+    box-shadow: 0 0 22px -6px rgba(15, 70, 243, 0.35);
+  }
+}
+.eg-receipt-glow {
+  animation: eg-receipt-glow 4.5s ease-in-out infinite;
 }
 
 /* Thin scrollbars for the console panes. */
@@ -307,11 +300,14 @@
   background: transparent;
 }
 .eg-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(10, 25, 49, 0.18);
   border-radius: 999px;
 }
+:root.dark .eg-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+}
 .eg-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(30, 144, 255, 0.45);
+  background: rgba(15, 70, 243, 0.45);
 }
 
 @media (prefers-reduced-motion: reduce) {

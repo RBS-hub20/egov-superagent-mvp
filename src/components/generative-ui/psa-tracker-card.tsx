@@ -56,7 +56,7 @@ export function PSATrackerCard() {
         <Field label="Copies" value={`${psa.request.copies} copies`} />
         <Field label="Purpose" value={psa.request.purpose} />
         <Field label="Official fee" value={`${peso(psa.request.fee)} — ${psa.request.paymentStatus}`} />
-        <Field label="Ready by" value={<span className="text-egov-navy">{phDate(psa.request.etaDate)}</span>} />
+        <Field label="Ready by" value={<span className="text-lp-primary">{phDate(psa.request.etaDate)}</span>} />
       </dl>
 
       {/* Stepper */}
@@ -80,7 +80,7 @@ export function PSATrackerCard() {
                 className={cn(
                   "relative z-10 mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-white",
                   done && "bg-emerald-500",
-                  current && "bg-egov-action",
+                  current && "bg-lp-primary",
                   !done && !current && "border border-black/15 bg-white text-black/35"
                 )}
               >
@@ -97,7 +97,7 @@ export function PSATrackerCard() {
                   <p
                     className={cn(
                       "text-sm font-semibold",
-                      current ? "text-egov-action" : done ? "text-black/85" : "text-black/45"
+                      current ? "text-lp-primary" : done ? "text-black/85" : "text-black/45"
                     )}
                   >
                     {step.label}
