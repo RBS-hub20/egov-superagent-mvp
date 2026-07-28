@@ -120,7 +120,7 @@ export function ConnectIdModal({ open, onClose }: { open: boolean; onClose: () =
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Santo Tomas, Batangas"
+                placeholder="Quezon City"
                 className="mt-1.5 w-full rounded-xl border border-lp-line bg-white px-3.5 py-2.5 text-[14.5px] text-lp-ink outline-none transition placeholder:text-lp-body/40 focus:border-lp-primary/60 focus:ring-2 focus:ring-lp-primary/15 dark:border-lp-dark-line dark:bg-white/[0.04] dark:text-lp-dark-text dark:placeholder:text-lp-dark-muted/60"
               />
             </label>

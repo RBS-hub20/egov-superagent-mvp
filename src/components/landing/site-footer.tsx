@@ -9,8 +9,7 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <Image src="/logo.png" alt="eGov SuperAgent" width={520} height={257} className="h-11 w-auto" />
           <p className="mt-4 text-[13.5px] leading-relaxed text-lp-body dark:text-lp-dark-muted">
-            {TAGLINE} An MVP demonstration built on mock SSS, PhilHealth, Pag-IBIG and PSA data —
-            not affiliated with any Philippine government agency.
+            {TAGLINE} An MVP demonstration built on mock SSS, PhilHealth, Pag-IBIG and PSA data.
           </p>
         </div>
 
@@ -43,25 +42,13 @@ export function SiteFooter() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-lp-body/55 dark:text-lp-dark-muted/70">
               Built by
             </p>
-            <p className="font-semibold text-lp-ink dark:text-lp-dark-text">RBS Labs Inc.</p>
-            <p className="text-lp-body dark:text-lp-dark-muted">
-              Santo Tomas
-              <br />
-              Calabarzon, Philippines
-            </p>
+            <p className="font-semibold text-lp-ink dark:text-lp-dark-text">{LICENSEE.short}</p>
           </div>
         </div>
       </div>
 
-      <p className="mx-auto mt-8 max-w-6xl text-[12px] text-lp-body/60 dark:text-lp-dark-muted/70">
-        Built by{" "}
-        <span className="font-bold text-lp-ink dark:text-lp-dark-text">{LICENSEE.name}</span> •{" "}
-        {LICENSEE.role}
-      </p>
-
-      <div className="mx-auto mt-6 max-w-6xl border-t border-lp-line pt-6 text-[12.5px] text-lp-body/70 dark:border-lp-dark-line dark:text-lp-dark-muted/70">
-        © {new Date().getFullYear()} RBS Labs Inc. Mock data only — walang fixer, walang
-        dagdag-bayad.
+      <div className="mx-auto mt-10 max-w-6xl border-t border-lp-line pt-6 text-[12.5px] text-lp-body/70 dark:border-lp-dark-line dark:text-lp-dark-muted/70">
+        © {new Date().getFullYear()} {LICENSEE.short} • Mock data only — not affiliated with gov.
       </div>
     </footer>
   );

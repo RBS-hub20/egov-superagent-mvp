@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Check, KeyRound, ReceiptText, ShieldCheck } from "lucide-react";
 import { RECEIPT, peso, phDate } from "@/lib/data";
+import { shortNameOf, useUser } from "@/lib/user";
 
 const POINTS = [
   {
@@ -23,6 +24,10 @@ const POINTS = [
 ];
 
 export function TrustReceipt() {
+  // The audit line carries a {name} placeholder so it can name whoever is
+  // connected — "you" until someone is.
+  const filedFor = shortNameOf(useUser());
+
   return (
     <section id="trust" className="relative px-5 py-24 sm:px-6">
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
@@ -134,7 +139,9 @@ export function TrustReceipt() {
                   <span className="shrink-0 font-mono text-lp-body/50 dark:text-lp-dark-muted/70">
                     {entry.at}
                   </span>
-                  <span className="text-lp-body dark:text-lp-dark-muted">{entry.event}</span>
+                  <span className="text-lp-body dark:text-lp-dark-muted">
+                    {entry.event.replace("{name}", filedFor)}
+                  </span>
                 </li>
               ))}
             </ol>

@@ -30,11 +30,12 @@ export const LOGOS = {
   lockupLight: "/logos/egov-superagent-lockup-light.png",
 } as const;
 
-/** Licensed operator of this build — shown in the app chrome and metadata. */
+/** Operator of this build — shown in the app chrome and metadata. */
 export const LICENSEE = {
+  /** Full legal name: metadata and the console sidebar. */
   name: "AXLA SOFTWARE DEVELOPMENT SERVICES",
+  /** Short form for tight UI: footer column, receipt line. */
   short: "AXLA",
-  role: "Licensed eGov Solutions Provider",
 } as const;
 
 export const TAGLINE = "Super Agent. All Services.";

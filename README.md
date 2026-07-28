@@ -161,9 +161,9 @@ through `SITE_URL`.
 
 ## Licensing
 
-Built by **AXLA SOFTWARE DEVELOPMENT SERVICES** — Licensed eGov Solutions
-Provider. The attribution appears in the landing footer, the console sidebar,
-the Anti-Fixer Receipt, and as `<meta name="author">`.
+Built by **AXLA SOFTWARE DEVELOPMENT SERVICES**. The attribution appears in the
+landing footer, the console sidebar, the Anti-Fixer Receipt, and as
+`<meta name="author">`.
 
 ## Scope
 

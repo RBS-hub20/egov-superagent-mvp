@@ -98,29 +98,32 @@ export function ChatPanel({
   // Clear pending reply timers if the conversation unmounts mid-flight.
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
-  const send = useCallback((text: string) => {
-    const turn = respond(text);
-    setMessages((prev) => [...prev, { id: nextId(), role: "user", text, card: null }]);
-    setWorking(turn.working);
+  const send = useCallback(
+    (text: string) => {
+      const turn = respond(text, { name: user.name, verified: user.verified });
+      setMessages((prev) => [...prev, { id: nextId(), role: "user", text, card: null }]);
+      setWorking(turn.working);
 
-    const t = setTimeout(
-      () => {
-        setWorking(null);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: nextId(),
-            role: "agent",
-            text: turn.reply,
-            card: turn.card,
-            suggestions: turn.suggestions,
-          },
-        ]);
-      },
-      turn.card ? 900 : 600
-    );
-    timers.current.push(t);
-  }, []);
+      const t = setTimeout(
+        () => {
+          setWorking(null);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: nextId(),
+              role: "agent",
+              text: turn.reply,
+              card: turn.card,
+              suggestions: turn.suggestions,
+            },
+          ]);
+        },
+        turn.card ? 900 : 600
+      );
+      timers.current.push(t);
+    },
+    [user.name, user.verified]
+  );
 
   // A service tile on the landing page can deep-link a first utos: /app?q=…
   useEffect(() => {

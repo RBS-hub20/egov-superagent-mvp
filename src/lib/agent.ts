@@ -37,8 +37,15 @@ export function detectIntent(input: string): AgentIntent {
   return "fallback";
 }
 
-export function respond(input: string): AgentTurn {
+/** The connected profile, so replies never assert facts about a guest. */
+export interface AgentUser {
+  name: string;
+  verified: boolean;
+}
+
+export function respond(input: string, user?: AgentUser): AgentTurn {
   const intent = detectIntent(input);
+  const knowsYou = user?.verified ?? false;
 
   switch (intent) {
     case "sss":
@@ -91,9 +98,12 @@ export function respond(input: string): AgentTurn {
         intent,
         card: null,
         working: [],
-        reply:
-          "Naalala ko: PhilSys ID mo ****1234, empleyado ka sa RBS Labs Inc. mula 2015, at P1,350/buwan ang SSS mo. Kaya hindi na kita tinatanong ulit tuwing may aasikasuhin tayo.",
-        suggestions: ["Check my SSS contributions", "Show my PhilHealth", "Request PSA birth certificate"],
+        reply: knowsYou
+          ? `Naalala ko: ${user?.name}, naka-link na ang PhilSys ID mo, at P1,350/buwan ang SSS mo. Nasa "Naalala ko" panel sa kanan ang buong listahan — kaya hindi na kita tinatanong ulit.`
+          : "Wala pa akong naaalala tungkol sa iyo, boss — guest ka pa. Pindutin ang Connect ID para ma-link ang pangalan at ID mo; doon lang ako magsisimulang matuto, at sa device mo lang naka-save.",
+        suggestions: knowsYou
+          ? ["Check my SSS contributions", "Show my PhilHealth", "Request PSA birth certificate"]
+          : ["Check my SSS contributions", "Show my PhilHealth"],
       };
     case "greeting":
       return {
@@ -101,7 +111,9 @@ export function respond(input: string): AgentTurn {
         card: null,
         working: [],
         reply:
-          "Kumusta boss! Nandito lang ako. Pwede kitang tulungan sa SSS, PhilHealth, Pag-IBIG, at PSA — sabihin mo lang kung ano ang kailangan.",
+          knowsYou
+            ? `Kumusta ${user?.name?.split(" ")[0]}! Nandito lang ako. Pwede kitang tulungan sa SSS, PhilHealth, Pag-IBIG, at PSA — sabihin mo lang kung ano ang kailangan.`
+            : "Kumusta boss! Nandito lang ako. Pwede kitang tulungan sa SSS, PhilHealth, Pag-IBIG, at PSA — sabihin mo lang kung ano ang kailangan.",
         suggestions: ["Check my SSS contributions", "Show my PhilHealth", "Request PSA birth certificate"],
       };
     default:
