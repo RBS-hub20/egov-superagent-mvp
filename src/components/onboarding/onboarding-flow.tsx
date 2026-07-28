@@ -15,7 +15,7 @@ const SLIDES = [
   {
     key: "utusan",
     title: "Utusan mo lang ako.",
-    body: "Hindi mo na kailangan maghanap sa menu. Sabihin mo lang “bayaran mo SSS ko” — ako na bahala sa 4 ahensya.",
+    body: "Hindi mo na kailangan maghanap sa menu. Sabihin mo lang “bayaran mo SSS ko” — ako na bahala sa 6 ahensya.",
     Illustration: UtusanIllustration,
   },
   {

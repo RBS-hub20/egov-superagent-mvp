@@ -97,7 +97,7 @@ export const philHealth = philHealthJson as PhilHealthRecord;
 export const psa = psaJson as PsaRecord;
 
 export interface Agency {
-  id: "sss" | "philhealth" | "pagibig" | "psa";
+  id: "sss" | "philhealth" | "pagibig" | "psa" | "immigration" | "dfa";
   name: string;
   full: string;
   connected: boolean;
@@ -109,6 +109,8 @@ export const AGENCIES: Agency[] = [
   { id: "philhealth", name: "PhilHealth", full: "Philippine Health Insurance Corp.", connected: true, detail: "Membership, dependents, Konsulta" },
   { id: "pagibig", name: "Pag-IBIG", full: "Home Development Mutual Fund", connected: true, detail: "MP2 savings, housing loan" },
   { id: "psa", name: "PSA", full: "Philippine Statistics Authority", connected: true, detail: "Birth, marriage, CENOMAR" },
+  { id: "immigration", name: "Immigration", full: "Bureau of Immigration — eTravel", connected: true, detail: "eTravel declarations, departure" },
+  { id: "dfa", name: "DFA", full: "Department of Foreign Affairs", connected: true, detail: "Passport validity, renewal" },
 ];
 
 export interface MemoryFact {

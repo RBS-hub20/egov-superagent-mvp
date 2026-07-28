@@ -1,0 +1,24 @@
+{
+  "agency": "Bureau of Immigration — eTravel",
+  "defaults": {
+    "nationality": "Filipino",
+    "direction": "Departing passenger",
+    "originCountry": "Philippines",
+    "port": "NAIA Terminal 3, Pasay City",
+    "submissionStatus": "Waiting for your consent"
+  },
+  "steps": [
+    { "key": "vault", "label": "Vault ID", "detail": "Passport and PhilSys read from your encrypted vault", "agency": "Vault" },
+    { "key": "passport", "label": "Passport check", "detail": "Validity checked against the 6-month rule", "agency": "DFA" },
+    { "key": "etravel", "label": "eTravel Gov", "detail": "Declaration drafted on the eTravel system", "agency": "eTravel" },
+    { "key": "immigration", "label": "Immigration", "detail": "Departure record matched to your flight manifest", "agency": "Bureau of Immigration" },
+    { "key": "dfa", "label": "DFA reminder", "detail": "Passport renewal window scheduled", "agency": "DFA" },
+    { "key": "receipt", "label": "AXLA receipt", "detail": "Anti-Fixer Receipt issued — official fee only", "agency": "AXLA" }
+  ],
+  "elapsedSeconds": 9.4,
+  "reminder": "You will receive an SMS and email reminder for your DFA passport renewal 6 months before it expires — walang fixer, walang dagdag-bayad.",
+  "nextSteps": [
+    "Save the QR record to your phone before you head to the airport.",
+    "Present the QR at the eTravel counter for immigration clearance."
+  ]
+}

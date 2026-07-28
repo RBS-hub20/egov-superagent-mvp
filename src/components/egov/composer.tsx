@@ -69,7 +69,7 @@ export function Composer({
         </button>
       </div>
       <p className="mt-2 px-1 text-[10.5px] text-lp-body/55 dark:text-lp-dark-muted/60">
-        MVP build — SSS, PhilHealth, Pag-IBIG at PSA lang muna, at mock data ang lahat ng sagot.
+        MVP build — SSS, PhilHealth, Pag-IBIG, PSA, eTravel at DFA, at mock data ang lahat ng sagot.
       </p>
     </form>
   );

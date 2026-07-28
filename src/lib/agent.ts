@@ -1,3 +1,5 @@
+import { detectETravelIntent, type ETravelIntent } from "./intents";
+
 /**
  * SuperAgent intent routing.
  *
@@ -5,10 +7,19 @@
  * does have is Taglish tolerance: "pakicheck yung sss ko", "magkano contribution
  * ko", and "check my sss contributions" all land on the same intent.
  */
-export type AgentIntent = "sss" | "philhealth" | "psa" | "pagibig" | "vault" | "memory" | "greeting" | "fallback";
+export type AgentIntent =
+  | "etravel"
+  | "sss"
+  | "philhealth"
+  | "psa"
+  | "pagibig"
+  | "vault"
+  | "memory"
+  | "greeting"
+  | "fallback";
 
 /** Which generative-UI card the agent renders with its reply, if any. */
-export type CardKind = "sss" | "philhealth" | "psa" | null;
+export type CardKind = "sss" | "philhealth" | "psa" | "etravel" | null;
 
 export interface AgentTurn {
   intent: AgentIntent;
@@ -18,6 +29,8 @@ export interface AgentTurn {
   suggestions: string[];
   /** Agencies the swarm touched — shown as working state before the reply. */
   working: string[];
+  /** Present only for the eTravel card, which is built from the message itself. */
+  etravel?: ETravelIntent;
 }
 
 const MATCHERS: { intent: AgentIntent; patterns: RegExp }[] = [
@@ -44,8 +57,23 @@ export interface AgentUser {
 }
 
 export function respond(input: string, user?: AgentUser): AgentTurn {
-  const intent = detectIntent(input);
   const knowsYou = user?.verified ?? false;
+
+  // eTravel is checked first: its trigger words ("flight", "departure") are
+  // specific enough that a match should win over the generic matchers.
+  const travel = detectETravelIntent(input);
+  if (travel) {
+    return {
+      intent: "etravel",
+      card: "etravel",
+      etravel: travel,
+      working: ["Vault", "DFA", "eTravel", "Bureau of Immigration"],
+      reply: "",
+      suggestions: [],
+    };
+  }
+
+  const intent = detectIntent(input);
 
   switch (intent) {
     case "sss":
@@ -112,7 +140,7 @@ export function respond(input: string, user?: AgentUser): AgentTurn {
         working: [],
         reply:
           knowsYou
-            ? `Kumusta ${user?.name?.split(" ")[0]}! Nandito lang ako. Pwede kitang tulungan sa SSS, PhilHealth, Pag-IBIG, at PSA — sabihin mo lang kung ano ang kailangan.`
+            ? `Kumusta ${user?.name?.split(" ")[0]}! Nandito lang ako. Pwede kitang tulungan sa SSS, PhilHealth, Pag-IBIG, PSA, eTravel at DFA — sabihin mo lang kung ano ang kailangan.`
             : "Kumusta boss! Nandito lang ako. Pwede kitang tulungan sa SSS, PhilHealth, Pag-IBIG, at PSA — sabihin mo lang kung ano ang kailangan.",
         suggestions: ["Check my SSS contributions", "Show my PhilHealth", "Request PSA birth certificate"],
       };
@@ -122,7 +150,7 @@ export function respond(input: string, user?: AgentUser): AgentTurn {
         card: null,
         working: [],
         reply:
-          "Hindi ko pa yata kaya 'yan sa MVP na ito, boss. Ang naka-connect sa akin ngayon: SSS, PhilHealth, Pag-IBIG, at PSA. Subukan mo: “check my sss contributions”, “philhealth status ko”, o “request PSA birth certificate”.",
+          "Hindi ko pa yata kaya 'yan sa MVP na ito, boss. Ang naka-connect sa akin ngayon: SSS, PhilHealth, Pag-IBIG, PSA, Bureau of Immigration (eTravel), at DFA. Subukan mo: “check my sss contributions”, “philhealth status ko”, o “request PSA birth certificate”.",
         suggestions: ["Check my SSS contributions", "Show my PhilHealth", "Request PSA birth certificate"],
       };
   }

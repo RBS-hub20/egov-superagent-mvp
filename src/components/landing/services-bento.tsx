@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, BellRing, HeartPulse, Home, PiggyBank, ScrollText, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, BellRing, BookUser, HeartPulse, Home, PiggyBank, Plane, ScrollText, ShieldCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { peso, philHealth, psa, sss } from "@/lib/data";
 
@@ -68,6 +68,23 @@ const TILES: Tile[] = [
     className: "md:col-span-2",
   },
   {
+    icon: Plane,
+    agency: "Immigration",
+    title: "eTravel, sabihin mo lang",
+    body: "“Flying to Singapore tomorrow at 3pm on PR510” — SuperAgent drafts the declaration and issues the QR you show at the counter.",
+    tint: "#0F46F3",
+    prompt: "flying to singapore tomorrow at 3pm on PR510, create etravel for me",
+    className: "md:col-span-2",
+  },
+  {
+    icon: BookUser,
+    agency: "DFA",
+    title: "Passport, bantay ang expiry",
+    body: "Checked against the six-month rule before every trip, with the renewal window flagged months ahead.",
+    tint: "#20C997",
+    className: "md:col-span-2",
+  },
+  {
     icon: ShieldCheck,
     agency: "Vault",
     title: "Your IDs, sealed on-device",
@@ -79,7 +96,7 @@ const TILES: Tile[] = [
     icon: BellRing,
     agency: "Alerts",
     title: "Warned before the penalty",
-    body: "Due dates across all four agencies surface days early — “Boss, due ng SSS mo in 3 days. Bayaran ko na?” You answer Yes, and it is handled.",
+    body: "Due dates across all six agencies surface days early — “Boss, due ng SSS mo in 3 days. Bayaran ko na?” You answer Yes, and it is handled.",
     tint: "#FFC700",
     wide: true,
     className: "md:col-span-4",
@@ -135,7 +152,7 @@ export function ServicesBento() {
               Services
             </p>
             <h2 className="mt-3 text-[34px] font-bold tracking-tight text-lp-ink dark:text-lp-dark-text sm:text-[42px]">
-              Four agencies. One utos.
+              Six agencies. One utos.
             </h2>
           </div>
           <p className="max-w-sm text-[15px] leading-relaxed text-lp-body dark:text-lp-dark-muted">

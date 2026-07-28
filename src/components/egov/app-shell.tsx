@@ -7,6 +7,7 @@ import { ChatPanel } from "./chat-panel";
 import { ConnectIdModal } from "./connect-id-modal";
 import { ConsoleLogo } from "./console-logo";
 import { InsightRail } from "./insight-rail";
+import { LogsModal } from "./logs-modal";
 import { Sidebar } from "./sidebar";
 
 export function AppShell() {
@@ -15,11 +16,18 @@ export function AppShell() {
   const [navOpen, setNavOpen] = useState(false);
   const [railOpen, setRailOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
+  const [logsOpen, setLogsOpen] = useState(false);
 
   function openConnect() {
     setNavOpen(false);
     setRailOpen(false);
     setConnectOpen(true);
+  }
+
+  function openLogs() {
+    setNavOpen(false);
+    setRailOpen(false);
+    setLogsOpen(true);
   }
 
   function newConversation() {
@@ -53,6 +61,7 @@ export function AppShell() {
             onNewConversation={newConversation}
             onOpenMemory={() => setRailOpen(true)}
             onOpenVault={() => setRailOpen(true)}
+            onOpenLogs={openLogs}
             onConnectId={openConnect}
           />
         </motion.aside>
@@ -109,6 +118,7 @@ export function AppShell() {
                   setNavOpen(false);
                   setRailOpen(true);
                 }}
+                onOpenLogs={openLogs}
                 onConnectId={openConnect}
                 onClose={() => setNavOpen(false)}
               />
@@ -159,6 +169,7 @@ export function AppShell() {
       </AnimatePresence>
 
       <ConnectIdModal open={connectOpen} onClose={() => setConnectOpen(false)} />
+      <LogsModal open={logsOpen} onClose={() => setLogsOpen(false)} />
     </div>
   );
 }

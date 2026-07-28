@@ -9,8 +9,10 @@ import { Composer } from "./composer";
 import { ProactiveBanner } from "./proactive-banner";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { PhilHealthCard, PSATrackerCard, SSSContributionsCard } from "@/components/generative-ui";
+import { ETravelFlow } from "@/components/cards/etravel-flow";
 import { respond, type CardKind } from "@/lib/agent";
-import { peso, phDate, sss } from "@/lib/data";
+import { buildDraft, type ETravelDraft } from "@/lib/etravel";
+import { AGENCIES, peso, phDate, sss } from "@/lib/data";
 import { initialsOf, useUser } from "@/lib/user";
 
 interface Message {
@@ -19,14 +21,20 @@ interface Message {
   text: string;
   card: CardKind;
   suggestions?: string[];
+  /** Built from the message that triggered it, so each request has its own trip. */
+  etravel?: ETravelDraft;
 }
 
 const WELCOME: Message = {
   id: "welcome",
   role: "agent",
-  text: "Kumusta boss! I am SuperAgent. Utusan mo ako — check SSS, PhilHealth, o request PSA.",
+  text: "Kumusta boss! I am SuperAgent. Utusan mo ako — check SSS, PhilHealth, request PSA, o gumawa ng eTravel para sa lipad mo.",
   card: null,
-  suggestions: ["Check my SSS contributions", "Show my PhilHealth", "Request PSA birth certificate"],
+  suggestions: [
+    "Check my SSS contributions",
+    "Flying to Singapore tomorrow at 3pm on PR510, create eTravel",
+    "Request PSA birth certificate",
+  ],
 };
 
 let counter = 0;
@@ -40,10 +48,11 @@ function AgentAvatar() {
   );
 }
 
-function CardFor({ kind }: { kind: CardKind }) {
+function CardFor({ kind, etravel }: { kind: CardKind; etravel?: ETravelDraft }) {
   if (kind === "sss") return <SSSContributionsCard />;
   if (kind === "philhealth") return <PhilHealthCard />;
   if (kind === "psa") return <PSATrackerCard />;
+  if (kind === "etravel" && etravel) return <ETravelFlow draft={etravel} />;
   return null;
 }
 
@@ -101,6 +110,9 @@ export function ChatPanel({
   const send = useCallback(
     (text: string) => {
       const turn = respond(text, { name: user.name, verified: user.verified });
+      const etravel = turn.etravel
+        ? buildDraft(turn.etravel, user.verified ? user.name : "Guest traveler")
+        : undefined;
       setMessages((prev) => [...prev, { id: nextId(), role: "user", text, card: null }]);
       setWorking(turn.working);
 
@@ -115,6 +127,7 @@ export function ChatPanel({
               text: turn.reply,
               card: turn.card,
               suggestions: turn.suggestions,
+              etravel,
             },
           ]);
         },
@@ -182,7 +195,7 @@ export function ChatPanel({
           <p className="mt-0.5 inline-flex items-center gap-1.5 rounded-full border border-lp-line bg-white/70 px-2.5 py-0.5 text-[11px] text-lp-body dark:border-lp-dark-line dark:bg-white/[0.04] dark:text-lp-dark-muted">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 eg-pulse" aria-hidden />
             <span className="truncate">
-              4 agencies connected —{" "}
+              {AGENCIES.length} agencies connected —{" "}
               {user.verified ? `acting for ${user.name}` : "Guest mode — connect ID"}
             </span>
           </p>
@@ -230,10 +243,12 @@ export function ChatPanel({
                 <div className="min-w-0 flex-1 space-y-3">
                   {/* Blue left border marks the agent's own voice; anything on a
                       white document card below is an agency record. */}
-                  <div className="inline-block rounded-2xl rounded-tl-sm border border-lp-line border-l-2 border-l-lp-primary bg-white px-4 py-3 text-[14.5px] leading-relaxed text-lp-ink shadow-[0_1px_2px_rgba(10,25,49,0.04)] dark:border-lp-dark-line dark:border-l-lp-primary dark:bg-lp-dark-card dark:text-lp-dark-text">
-                    {m.text}
-                  </div>
-                  {m.card ? <CardFor kind={m.card} /> : null}
+                  {m.text ? (
+                    <div className="inline-block rounded-2xl rounded-tl-sm border border-lp-line border-l-2 border-l-lp-primary bg-white px-4 py-3 text-[14.5px] leading-relaxed text-lp-ink shadow-[0_1px_2px_rgba(10,25,49,0.04)] dark:border-lp-dark-line dark:border-l-lp-primary dark:bg-lp-dark-card dark:text-lp-dark-text">
+                      {m.text}
+                    </div>
+                  ) : null}
+                  {m.card ? <CardFor kind={m.card} etravel={m.etravel} /> : null}
                   {m.suggestions?.length ? (
                     <div className="flex flex-wrap gap-2 pt-0.5">
                       {m.suggestions.map((s) => (

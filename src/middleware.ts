@@ -17,6 +17,7 @@ const PUBLIC_PATHS = new Set([
 ]);
 
 const PUBLIC_PREFIXES = [
+  "/verify/", // shareable record check
   "/api/webhook/", // Messenger and future channel callbacks carry no session
 ];
 

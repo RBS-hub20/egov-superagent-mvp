@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { BrainCircuit, IdCard, Lock, LogOut, Plus, User as UserIcon, X } from "lucide-react";
+import { BrainCircuit, IdCard, Lock, LogOut, Plus, ScrollText, User as UserIcon, X } from "lucide-react";
 import { ConsoleLogo } from "./console-logo";
 import { AGENCIES, memoryFactsFor } from "@/lib/data";
 import { clearUser, initialsOf, useUser } from "@/lib/user";
@@ -13,12 +13,14 @@ export function Sidebar({
   onNewConversation,
   onOpenMemory,
   onOpenVault,
+  onOpenLogs,
   onConnectId,
   onClose,
 }: {
   onNewConversation: () => void;
   onOpenMemory: () => void;
   onOpenVault: () => void;
+  onOpenLogs: () => void;
   onConnectId: () => void;
   /** Present only when the sidebar is rendered as a mobile drawer. */
   onClose?: () => void;
@@ -115,6 +117,17 @@ export function Sidebar({
             Vault
             <span className="ml-auto text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
               Encrypted
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={onOpenLogs}
+            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] text-lp-body transition hover:bg-slate-100 hover:text-lp-ink dark:text-lp-dark-muted dark:hover:bg-white/[0.06] dark:hover:text-lp-dark-text"
+          >
+            <ScrollText className="h-4 w-4 text-lp-primary" />
+            Logs
+            <span className="ml-auto text-[10px] text-lp-body/55 dark:text-lp-dark-muted/70">
+              Local
             </span>
           </button>
         </div>

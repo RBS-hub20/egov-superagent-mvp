@@ -19,7 +19,7 @@ function Stage({ children }: { children: React.ReactNode }) {
   );
 }
 
-const AGENCIES = ["SSS", "PhilHealth", "Pag-IBIG", "PSA"];
+const AGENCIES = ["SSS", "PhilHealth", "Pag-IBIG", "PSA", "Immigration", "DFA"];
 
 /** Slide 1 — one instruction, four agencies handled. */
 export function UtusanIllustration() {

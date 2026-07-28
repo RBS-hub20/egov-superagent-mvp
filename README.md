@@ -22,6 +22,7 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 | `/` | Landing — light by default with a dark/light toggle: animated hero, Why SuperAgent, services bento, Anti-Fixer Receipt |
 | `/onboarding` | First-run intro — three swipeable slides, shown once per browser |
 | `/app` | The console — same theme as the landing: sidebar, chat with generative UI, vault + receipt + memory rail |
+| `/verify/[id]` | Record check for an `ETR-PH-…` declaration or the `EGOV-…` receipt — device-local, noindex |
 | `/api/webhook/messenger` | `POST` logs the payload and returns `{ ok: true }`; `GET` completes the `hub.challenge` handshake when `MESSENGER_VERIFY_TOKEN` matches |
 
 ## Run it
@@ -50,7 +51,7 @@ Deliberately nothing else.
 ## Layout of the code
 
 ```
-mocks/                        sss.json, philhealth.json, psa.json — the only data source
+mocks/                        sss.json, philhealth.json, psa.json, etravel.json — the only data source
 public/logo.png               primary lockup (transparent) — hero, footer, README
 public/logo-icon.png          SA monogram only — nav, compact chrome
 public/logos/                 favicons + earlier kit exports (source/ holds the originals)
@@ -61,6 +62,8 @@ src/app/
   ├─ layout.tsx               metadata, favicons, OG
   └─ robots.ts, sitemap.ts    generated from NEXT_PUBLIC_SITE_URL
 src/components/
+  ├─ cards/                   ETravelCard + the review → registered flow
+  ├─ verify/                  record check screen
   ├─ onboarding/            three-slide intro, its illustrations, and the /app gate
   ├─ landing/                 nav, hero, why, services bento, trust receipt, footer, background FX
   ├─ theme/                   ThemeProvider + pill toggle (localStorage 'egov-theme')
@@ -71,6 +74,9 @@ src/components/
 src/lib/                      brand tokens, typed mock access, agent intents, vault crypto, PDF export
 src/lib/user.ts               guest-by-default identity store (localStorage 'egov-user')
 src/lib/onboarding.ts         first-run flag (localStorage 'egov-onboarded')
+src/lib/intents.ts            eTravel intent + Taglish date/flight parsing
+src/lib/etravel.ts            draft, reference, mock submission, history
+src/lib/etravel-pdf.ts        the declaration PDF, built client-side
 src/middleware.ts             public-path allowlist + baseline security headers
 ```
 
@@ -100,6 +106,25 @@ bits (solid panels, scrollbars, receipt glow) and inherit those same variables.
 One deliberate exception: the generative-UI cards stay white in both themes.
 Anything on a white document surface is an agency record you can download or
 show at a counter — that meaning would be lost if it followed the theme.
+
+## eTravel
+
+Say it the way you would to a person — "im flying to singapore tomorrow at 3pm on
+PR510, balik ako aug 5 6pm" — and `src/lib/intents.ts` pulls out the destination,
+the flight, and both dates. Times are built at an explicit **+08:00**, so 3pm
+means 3pm in Manila whatever timezone the browser is in. Anything it cannot read
+comes back as null and the card says "not specified" instead of inventing a
+flight.
+
+The review card shows what would be filed; submitting produces a reference
+(`ETR-PH-YYMMDD-####`, dated by departure), a scannable QR, a PDF built on the
+device, and a row in `etravel-history`. Sidebar → **Logs** lists them, and each
+links to `/verify/<reference>`.
+
+**Nothing is filed with anyone.** `submitETravel()` returns mock data and says
+so in the code; the intended path — a server-side Playwright session against
+etravel.gov.ph with a human dashboard for the cases it can't finish — is a TODO
+in that file. Every surface that shows a record says it is a demo.
 
 ## First run
 
