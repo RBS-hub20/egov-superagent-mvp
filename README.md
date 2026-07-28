@@ -22,6 +22,8 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 | `/` | Landing — light by default with a dark/light toggle: animated hero, Why SuperAgent, services bento, Anti-Fixer Receipt |
 | `/onboarding` | First-run intro — three swipeable slides, shown once per browser |
 | `/app` | The console — same theme as the landing: sidebar, chat with generative UI, vault + receipt + memory rail |
+| `/admin` | Owner console — eTravel queue, Bayad Center, PSA deliveries, logs, settings. Password-gated |
+| `/admin/login` | Password entry for the console |
 | `/verify/[id]` | Record check for an `ETR-PH-…` declaration or the `EGOV-…` receipt — device-local, noindex |
 | `/api/webhook/messenger` | `POST` logs the payload and returns `{ ok: true }`; `GET` completes the `hub.challenge` handshake when `MESSENGER_VERIFY_TOKEN` matches |
 
@@ -62,6 +64,7 @@ src/app/
   ├─ layout.tsx               metadata, favicons, OG
   └─ robots.ts, sitemap.ts    generated from NEXT_PUBLIC_SITE_URL
 src/components/
+  ├─ admin/                   owner console: queue, filing modal, order tables, logs, settings
   ├─ cards/                   ETravelCard + the review → registered flow
   ├─ verify/                  record check screen
   ├─ onboarding/            three-slide intro, its illustrations, and the /app gate
@@ -77,6 +80,8 @@ src/lib/onboarding.ts         first-run flag (localStorage 'egov-onboarded')
 src/lib/intents.ts            eTravel intent + Taglish date/flight parsing
 src/lib/etravel.ts            draft, reference, mock submission, history
 src/lib/etravel-pdf.ts        the declaration PDF, built client-side
+src/lib/orders.ts             Bayad/PSA orders for the console
+src/lib/admin-auth.ts         console password check + cookie token
 src/middleware.ts             public-path allowlist + baseline security headers
 ```
 
@@ -132,6 +137,28 @@ links to `/verify/<reference>`.
 so in the code; the intended path — a server-side Playwright session against
 etravel.gov.ph with a human dashboard for the cases it can't finish — is a TODO
 in that file. Every surface that shows a record says it is a demo.
+
+## Owner console
+
+`/admin` is where an operator turns a demo declaration into a real one. The
+eTravel queue lists everything the app has drafted; **File now** opens the
+agency site, offers each traveller field with a copy button, and takes back the
+official reference, the QR screenshot and any notes. Marking it filed moves the
+row to **FILED**, tells the traveller in chat, and updates `/verify`.
+
+Access is gated server-side: the password is checked in an API route against
+`ADMIN_PASSWORD` and the resulting cookie is httpOnly and carries a hash of that
+password, so the console cannot be unlocked by editing localStorage. Middleware
+redirects every `/admin` route to the login screen without a valid cookie.
+
+**Set `ADMIN_PASSWORD` in the deployment.** The fallback in `src/lib/admin-auth.ts`
+is a development default and is visible in this repository.
+
+What the console records is an **operator attestation** — "I filed this on
+etravel.gov.ph and the agency returned this reference." It is not a lookup
+against the Bureau of Immigration, and `/verify` says so next to the filed
+badge. No payment processor is connected; the Bayad Center's payment column is
+demo data.
 
 ## First run
 

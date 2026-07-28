@@ -11,7 +11,7 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { PhilHealthCard, PSATrackerCard, SSSContributionsCard } from "@/components/generative-ui";
 import { ETravelFlow } from "@/components/cards/etravel-flow";
 import { respond, type CardKind } from "@/lib/agent";
-import { buildDraft, type ETravelDraft } from "@/lib/etravel";
+import { buildDraft, markNotified, unnotifiedFilings, type ETravelDraft } from "@/lib/etravel";
 import { AGENCIES, peso, phDate, sss } from "@/lib/data";
 import { initialsOf, useUser } from "@/lib/user";
 
@@ -137,6 +137,29 @@ export function ChatPanel({
     },
     [user.name, user.verified]
   );
+
+  // When an operator files a declaration in the owner console, tell the
+  // traveller here. Polled because the console writes from another tab.
+  useEffect(() => {
+    function announce() {
+      const filed = unnotifiedFilings();
+      if (filed.length === 0) return;
+      setMessages((prev) => [
+        ...prev,
+        ...filed.map((record) => ({
+          id: nextId(),
+          role: "agent" as const,
+          text: `Boss, na-file na ang eTravel mo${record.flight ? ` para sa ${record.flight}` : ""} — official reference ${record.filing?.govReference}. Nasa /verify/${record.reference} ang kopya. Ito ay naitala ng AXLA operator na na-file na sa etravel.gov.ph.`,
+          card: null,
+          suggestions: ["Track my PSA request", "Check my SSS contributions"],
+        })),
+      ]);
+      filed.forEach((record) => markNotified(record.reference));
+    }
+    announce();
+    const id = setInterval(announce, 8000);
+    return () => clearInterval(id);
+  }, []);
 
   // A service tile on the landing page can deep-link a first utos: /app?q=…
   useEffect(() => {

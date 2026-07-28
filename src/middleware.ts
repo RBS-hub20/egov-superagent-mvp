@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { ADMIN_COOKIE, isValidAdminCookie } from "@/lib/admin-auth";
 
 /**
  * eGov SuperAgent has no accounts and no private data on the server — every
@@ -27,7 +28,25 @@ export function isPublicPath(pathname: string): boolean {
   );
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // The owner console is the one gated surface. The cookie is httpOnly and
+  // carries a hash of the password, so it cannot be forged client-side.
+  const isAdminArea =
+    (pathname === "/admin" || pathname.startsWith("/admin/")) && pathname !== "/admin/login";
+  if (isAdminArea) {
+    const ok = await isValidAdminCookie(req.cookies.get(ADMIN_COOKIE)?.value);
+    if (!ok) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/admin/login";
+      url.search = pathname === "/admin" ? "" : `?next=${encodeURIComponent(pathname)}`;
+      const redirect = NextResponse.redirect(url);
+      redirect.cookies.delete(ADMIN_COOKIE);
+      return redirect;
+    }
+  }
+
   const res = NextResponse.next();
 
   res.headers.set("X-Content-Type-Options", "nosniff");
@@ -38,8 +57,10 @@ export function middleware(req: NextRequest) {
   // The vault is a local-only promise; make it enforceable rather than a claim.
   // No connect-src to third parties means encrypted documents cannot be shipped
   // anywhere even if a dependency tried.
-  if (isPublicPath(req.nextUrl.pathname)) {
+  if (isPublicPath(pathname)) {
     res.headers.set("X-Robots-Tag", "index, follow");
+  } else if (pathname.startsWith("/admin")) {
+    res.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
 
   return res;

@@ -44,9 +44,31 @@ export interface ETravelDraft {
   port: string;
 }
 
+export type FilingStatus = "demo" | "filing" | "filed";
+
+/**
+ * An operator's attestation that the declaration was filed for real.
+ *
+ * This is a record of what a human says they did on the agency's own site — it
+ * is not a lookup against the Bureau of Immigration, and every surface that
+ * shows it says so. `govReference` is the number the agency issued.
+ */
+export interface ETravelFiling {
+  status: FilingStatus;
+  govReference?: string;
+  filedAt?: string;
+  filedBy?: string;
+  qrFileName?: string;
+  pdfFileName?: string;
+  notes?: string;
+  /** Set once the traveller has been told in chat. */
+  notified?: boolean;
+}
+
 export interface ETravelRecord extends ETravelDraft {
   reference: string;
   registeredAt: string;
+  filing?: ETravelFiling;
 }
 
 const HISTORY_KEY = "etravel-history";
@@ -143,6 +165,34 @@ export function readHistory(): ETravelRecord[] {
 export function findByReference(reference: string): ETravelRecord | null {
   const target = reference.trim().toUpperCase();
   return readHistory().find((r) => r.reference.toUpperCase() === target) ?? null;
+}
+
+/** Records the operator's filing attestation against a declaration. */
+export function updateFiling(reference: string, filing: Partial<ETravelFiling>): ETravelRecord[] {
+  const history = readHistory().map((record) =>
+    record.reference.toUpperCase() === reference.trim().toUpperCase()
+      ? { ...record, filing: { status: "demo" as FilingStatus, ...record.filing, ...filing } }
+      : record
+  );
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch {
+    // Storage blocked — the console still reflects the change this session.
+  }
+  return history;
+}
+
+export function filingStatus(record: ETravelRecord): FilingStatus {
+  return record.filing?.status ?? "demo";
+}
+
+/** Declarations filed but not yet announced to the traveller in chat. */
+export function unnotifiedFilings(): ETravelRecord[] {
+  return readHistory().filter((r) => r.filing?.status === "filed" && !r.filing.notified);
+}
+
+export function markNotified(reference: string): void {
+  updateFiling(reference, { notified: true });
 }
 
 /* ------------------------------------------------------------ formatting -- */
