@@ -53,6 +53,12 @@ function StepSummary() {
               </span>
             </li>
           ))}
+          <li className="flex gap-2 border-t border-lp-line pt-1.5 text-[12px] leading-snug dark:border-lp-dark-line">
+            <Check className="mt-0.5 h-3 w-3 shrink-0 text-emerald-500" />
+            <span className="text-lp-body/70 dark:text-lp-dark-muted/80">
+              {ETRAVEL.receiptNote}
+            </span>
+          </li>
         </motion.ol>
       ) : null}
     </div>

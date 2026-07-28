@@ -25,6 +25,7 @@ interface ETravelFixture {
   elapsedSeconds: number;
   reminder: string;
   nextSteps: string[];
+  receiptNote: string;
 }
 
 export const ETRAVEL = etravelJson as ETravelFixture;

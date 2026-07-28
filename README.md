@@ -116,6 +116,13 @@ means 3pm in Manila whatever timezone the browser is in. Anything it cannot read
 comes back as null and the card says "not specified" instead of inventing a
 flight.
 
+The step summary reads **6 steps across 6 agencies** and each one names a body
+that genuinely sits in a Philippine departure: PhilSys (identity), DFA (passport
+validity), Bureau of Quarantine (health declaration), eTravel (the declaration),
+Bureau of Immigration (departure record) and TIEZA (travel tax). The AXLA
+receipt is issued too — it is listed under the steps rather than counted, since
+AXLA is the builder, not an agency.
+
 The review card shows what would be filed; submitting produces a reference
 (`ETR-PH-YYMMDD-####`, dated by departure), a scannable QR, a PDF built on the
 device, and a row in `etravel-history`. Sidebar → **Logs** lists them, and each
