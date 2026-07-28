@@ -20,6 +20,7 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 | Route | What it is |
 | --- | --- |
 | `/` | Landing — light by default with a dark/light toggle: animated hero, Why SuperAgent, services bento, Anti-Fixer Receipt |
+| `/onboarding` | First-run intro — three swipeable slides, shown once per browser |
 | `/app` | The console — same theme as the landing: sidebar, chat with generative UI, vault + receipt + memory rail |
 | `/api/webhook/messenger` | `POST` logs the payload and returns `{ ok: true }`; `GET` completes the `hub.challenge` handshake when `MESSENGER_VERIFY_TOKEN` matches |
 
@@ -60,6 +61,7 @@ src/app/
   ├─ layout.tsx               metadata, favicons, OG
   └─ robots.ts, sitemap.ts    generated from NEXT_PUBLIC_SITE_URL
 src/components/
+  ├─ onboarding/            three-slide intro, its illustrations, and the /app gate
   ├─ landing/                 nav, hero, why, services bento, trust receipt, footer, background FX
   ├─ theme/                   ThemeProvider + pill toggle (localStorage 'egov-theme')
   ├─ generative-ui/           SSSContributionsCard, PhilHealthCard, PSATrackerCard, card chrome, sketch map
@@ -68,6 +70,7 @@ src/components/
   └─ egov/                    app shell, sidebar, chat panel, composer, memory graph
 src/lib/                      brand tokens, typed mock access, agent intents, vault crypto, PDF export
 src/lib/user.ts               guest-by-default identity store (localStorage 'egov-user')
+src/lib/onboarding.ts         first-run flag (localStorage 'egov-onboarded')
 src/middleware.ts             public-path allowlist + baseline security headers
 ```
 
@@ -97,6 +100,17 @@ bits (solid panels, scrollbars, receipt glow) and inherit those same variables.
 One deliberate exception: the generative-UI cards stay white in both themes.
 Anything on a white document surface is an agency record you can download or
 show at a counter — that meaning would be lost if it followed the theme.
+
+## First run
+
+A visitor who has not seen the console is sent to `/onboarding` — three slides
+covering how to ask, how the vault keeps the key on their device, and why the
+receipt makes a fixer pointless. Swipe, arrow keys, the dots or the button all
+page through; Skip and "Login here" jump straight in.
+
+Finishing sets `egov-onboarded` in localStorage and every later visit opens
+`/app` directly. A deep link survives the detour: `/app?q=…` becomes
+`/onboarding?next=…` and the prompt still runs once the console opens.
 
 ## Identity
 

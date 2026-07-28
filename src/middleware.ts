@@ -12,6 +12,7 @@ import type { NextRequest } from "next/server";
  */
 const PUBLIC_PATHS = new Set([
   "/", // landing
+  "/onboarding", // first-run intro
   "/app", // SuperAgent console
 ]);
 
