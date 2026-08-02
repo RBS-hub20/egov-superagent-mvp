@@ -15,20 +15,16 @@ export const BRAND = {
   green: "#20C997",
 } as const;
 
-export const LOGOS = {
-  /** Full-colour lockup on transparency — landing hero. */
-  main: "/logos/egov-superagent-main.png",
-  /** White lockup on transparency — /app sidebar and other dark chrome. */
-  white: "/logos/egov-superagent-white.png",
-  /** Icon-only "SA" mark in white — compact headers, chat avatar. */
-  markWhite: "/logos/egov-superagent-mark-white.png",
-  /** Navy app icon, rounded square. */
-  icon: "/logos/egov-superagent-icon.png",
-  /** Navy app icon, circular crop — favicon / avatar. */
-  iconCircle: "/logos/egov-superagent-icon-circle.png",
-  /** Original full-colour lockup on white — print / light backgrounds. */
-  lockupLight: "/logos/egov-superagent-lockup-light.png",
-} as const;
+/**
+ * One mark, one file. The navy "SA" tile at `/icon.png` is the whole identity —
+ * corners cut to transparency so it needs no light and dark variant — and the
+ * product name is live text next to it (`<BrandLockup>`), never baked artwork.
+ * `/logos/` holds only the derived favicon sizes and the original kit exports.
+ */
+export const ICON = "/icon.png";
+
+/** Social card, generated from the same tile. */
+export const OG_IMAGE = "/og.png";
 
 /** Operator of this build — shown in the app chrome and metadata. */
 export const LICENSEE = {

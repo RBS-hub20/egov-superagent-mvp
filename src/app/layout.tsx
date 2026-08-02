@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { BRAND, LICENSEE, PRODUCT, TAGLINE } from "@/lib/brand";
+import { BRAND, ICON, LICENSEE, OG_IMAGE, PRODUCT, TAGLINE } from "@/lib/brand";
 import { SITE_URL } from "@/lib/site";
 import { THEME_INIT_SCRIPT, ThemeProvider } from "@/components/theme/theme-provider";
 
@@ -22,12 +22,13 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
   icons: {
     icon: [
+      { url: "/logos/egov-favicon-16.png", type: "image/png", sizes: "16x16" },
       { url: "/logos/egov-favicon-32.png", type: "image/png", sizes: "32x32" },
       { url: "/logos/egov-favicon-192.png", type: "image/png", sizes: "192x192" },
-      { url: "/logos/egov-favicon-512.png", type: "image/png", sizes: "512x512" },
+      { url: ICON, type: "image/png", sizes: "512x512" },
     ],
     shortcut: "/logos/egov-favicon.ico",
-    apple: { url: "/logos/egov-favicon-180.png", sizes: "180x180" },
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
   },
   robots: {
     index: true,
@@ -41,13 +42,13 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: `${PRODUCT} — ${TAGLINE}`,
     description: DESCRIPTION,
-    images: [{ url: "/logos/egov-superagent-lockup-light.png", alt: PRODUCT }],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: PRODUCT }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${PRODUCT} — ${TAGLINE}`,
     description: DESCRIPTION,
-    images: ["/logos/egov-superagent-lockup-light.png"],
+    images: [OG_IMAGE],
   },
 };
 

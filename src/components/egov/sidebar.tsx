@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { BrainCircuit, IdCard, Lock, LogOut, Plus, ScrollText, User as UserIcon, X } from "lucide-react";
-import { ConsoleLogo } from "./console-logo";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 import { AGENCIES, memoryFactsFor } from "@/lib/data";
 import { clearUser, initialsOf, useUser } from "@/lib/user";
 import { LICENSEE } from "@/lib/brand";
@@ -33,7 +33,7 @@ export function Sidebar({
     <div className="eg-surface flex h-full w-full flex-col">
       <div className="flex items-start justify-between px-5 pb-4 pt-5">
         <Link href="/" aria-label="eGov SuperAgent home">
-          <ConsoleLogo width={140} />
+          <BrandLockup size={30} priority />
         </Link>
         {onClose ? (
           <button

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { AppIcon } from "@/components/brand/app-icon";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { Check, IdCard, KeyRound, Lock, ShieldCheck } from "lucide-react";
@@ -42,7 +42,7 @@ export function UtusanIllustration() {
           className="flex items-center gap-2.5 self-start"
         >
           <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-lp-line bg-white shadow-sm dark:border-lp-dark-line dark:bg-white/[0.08]">
-            <Image src="/logo-icon.png" alt="" width={72} height={44} className="h-5 w-auto" />
+            <AppIcon size={22} />
           </span>
           <span className="rounded-2xl rounded-tl-sm border border-lp-line border-l-2 border-l-lp-primary bg-white px-4 py-2.5 text-[14px] text-lp-ink shadow-sm dark:border-lp-dark-line dark:bg-lp-dark-card dark:text-lp-dark-text">
             Sige boss, ako na.

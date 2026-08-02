@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { ReceiptIllustration, UtusanIllustration, VaultIllustration } from "./illustrations";
-import { ConsoleLogo } from "@/components/egov/console-logo";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LICENSEE } from "@/lib/brand";
 import { completeOnboarding, isOnboarded } from "@/lib/onboarding";
@@ -84,8 +84,7 @@ export function OnboardingFlow() {
     <div className="lp-canvas flex min-h-[100dvh] flex-col">
       <header className="flex items-center justify-between px-5 pt-5 sm:px-6">
         <Link href="/" aria-label="eGov SuperAgent home">
-          {/* Theme-aware: the colour lockup's navy half disappears on the dark canvas. */}
-          <ConsoleLogo width={132} />
+          <BrandLockup size={30} priority />
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />

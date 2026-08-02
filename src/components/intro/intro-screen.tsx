@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { FilingIllustration } from "./filing-illustration";
+import { AppIcon } from "@/components/brand/app-icon";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 import { UtusanIllustration, VaultIllustration } from "@/components/onboarding/illustrations";
 import { LICENSEE } from "@/lib/brand";
 import { completeOnboarding, isOnboarded } from "@/lib/onboarding";
@@ -90,14 +91,9 @@ export function IntroScreen() {
   if (!ready) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center bg-white">
-        <Image
-          src="/logo.png"
-          alt="eGov SuperAgent"
-          width={520}
-          height={257}
-          priority
-          className="h-11 w-auto animate-pulse"
-        />
+        <span className="animate-pulse">
+          <AppIcon size={64} priority />
+        </span>
       </div>
     );
   }
@@ -107,14 +103,7 @@ export function IntroScreen() {
     // visitor's phone, so it ignores the dark theme the rest of the app offers.
     <div className="flex min-h-[100dvh] flex-col bg-white">
       <header className="flex justify-center pt-8 sm:pt-10">
-        <Image
-          src="/logo.png"
-          alt="eGov SuperAgent"
-          width={520}
-          height={257}
-          priority
-          className="h-11 w-auto sm:h-12"
-        />
+        <BrandLockup size={34} priority textClassName="text-[#0A1931]" />
       </header>
 
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-6">

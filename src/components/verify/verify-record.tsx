@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { ArrowLeft, BadgeCheck, HelpCircle, Plane, ReceiptText } from "lucide-react";
-import { ConsoleLogo } from "@/components/egov/console-logo";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LICENSEE } from "@/lib/brand";
 import { RECEIPT, peso, phDate } from "@/lib/data";
@@ -49,7 +49,7 @@ export function VerifyRecord({ id }: { id: string }) {
     <div className="lp-canvas min-h-[100dvh]">
       <header className="flex items-center justify-between px-5 py-4 sm:px-6">
         <Link href="/" aria-label="eGov SuperAgent home">
-          <ConsoleLogo width={128} />
+          <BrandLockup size={28} priority />
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />

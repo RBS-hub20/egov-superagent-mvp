@@ -1,6 +1,8 @@
 <div align="center">
 
-<img src="public/logo.png" alt="eGov SuperAgent" width="420" />
+<img src="public/icon.png" alt="eGov SuperAgent" width="128" />
+
+# eGov SuperAgent
 
 ### Super Agent. All Services.
 
@@ -56,9 +58,10 @@ Deliberately nothing else.
 
 ```
 mocks/                        sss.json, philhealth.json, psa.json, etravel.json — the only data source
-public/logo.png               primary lockup (transparent) — hero, footer, README
-public/logo-icon.png          SA monogram only — nav, compact chrome
-public/logos/                 favicons + earlier kit exports (source/ holds the originals)
+public/icon.png               the app icon — the only mark the UI loads (logo.png, logo-icon.png are copies)
+public/apple-touch-icon.png   180px, opaque navy behind the rounded corners
+public/og.png                 1200x630 social card, generated from the same tile
+public/logos/                 favicon sizes + earlier kit exports (source/ holds the originals)
 src/app/
   ├─ page.tsx                 landing
   ├─ app/page.tsx             console
@@ -70,6 +73,7 @@ src/components/
   ├─ cards/                   ETravelCard + the review → registered flow
   ├─ verify/                  record check screen
   ├─ onboarding/            three-slide intro, its illustrations, and the /app gate
+  ├─ brand/                   AppIcon + BrandLockup — the icon, and the icon with the name beside it
   ├─ landing/                 nav, hero, why, services bento, trust receipt, footer, background FX
   ├─ theme/                   ThemeProvider + pill toggle (localStorage 'egov-theme')
   ├─ generative-ui/           SSSContributionsCard, PhilHealthCard, PSATrackerCard, card chrome, sketch map
@@ -97,6 +101,15 @@ kaya 'yan" listing the four connected agencies.
 
 Landing service tiles deep-link a first utos into the console:
 `/app?q=check%20my%20sss%20contributions`.
+
+## The mark
+
+There is one brand asset: `public/icon.png`, the navy "SA" tile with its corners
+cut to real transparency, so the same file sits on the white landing and on the
+near-black console without a light or dark variant. `<AppIcon>` renders it;
+`<BrandLockup>` renders it with "eGov SuperAgent" beside it as live text, which
+means the name inherits the theme, stays selectable, and is never baked into
+artwork. No surface prints the product name underneath the icon.
 
 ## Theming
 

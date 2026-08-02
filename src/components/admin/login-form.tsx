@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Image from "next/image";
+import { AppIcon } from "@/components/brand/app-icon";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2, Lock } from "lucide-react";
@@ -52,7 +52,7 @@ export function AdminLogin() {
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-sm rounded-2xl border border-white/[0.08] bg-[#111113] p-7 shadow-2xl shadow-black/50"
       >
-        <Image src="/logo-icon.png" alt="" width={96} height={58} className="h-8 w-auto" />
+        <AppIcon size={34} priority />
         <h1 className="mt-5 text-[20px] font-bold tracking-tight text-white">Owner Console</h1>
         <p className="mt-1.5 text-[13px] text-zinc-500">
           Password only — walang signup. Built by {LICENSEE.short}.

@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const LINKS = [
@@ -30,18 +30,14 @@ export function SiteNav() {
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="eGov SuperAgent — home">
-          <Image
-            src="/logo-icon.png"
-            alt=""
-            width={96}
-            height={58}
+        <Link href="/" aria-label="eGov SuperAgent — home">
+          {/* The wordmark folds away on the narrowest phones; the tile alone
+              still reads as the app. */}
+          <BrandLockup
+            size={28}
             priority
-            className="h-7 w-auto"
+            textClassName="hidden text-lp-ink dark:text-lp-dark-text sm:inline"
           />
-          <span className="hidden text-[15px] font-bold tracking-tight text-lp-ink dark:text-lp-dark-text sm:block">
-            eGov <span className="text-lp-primary">SuperAgent</span>
-          </span>
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">

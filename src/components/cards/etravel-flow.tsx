@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { AppIcon } from "@/components/brand/app-icon";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
@@ -30,7 +30,7 @@ function StepSummary() {
         aria-expanded={open}
         className="inline-flex items-center gap-2 rounded-full border border-lp-line bg-white px-3 py-1.5 text-[12px] font-medium text-lp-body transition hover:border-lp-primary/40 hover:text-lp-ink dark:border-lp-dark-line dark:bg-white/[0.04] dark:text-lp-dark-muted dark:hover:text-lp-dark-text"
       >
-        <Image src="/logo-icon.png" alt="" width={48} height={30} className="h-3.5 w-auto" />
+        <AppIcon size={16} />
         <Check className="h-3.5 w-3.5 text-emerald-500" />
         Completed {ETRAVEL.steps.length} steps across {agencies} agencies •{" "}
         {ETRAVEL.elapsedSeconds}s

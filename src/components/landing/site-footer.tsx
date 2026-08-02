@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 import { LICENSEE, TAGLINE } from "@/lib/brand";
 
 export function SiteFooter() {
@@ -7,7 +7,7 @@ export function SiteFooter() {
     <footer className="relative border-t border-lp-line px-5 py-14 dark:border-lp-dark-line sm:px-6">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 sm:flex-row sm:justify-between">
         <div className="max-w-sm">
-          <Image src="/logo.png" alt="eGov SuperAgent" width={520} height={257} className="h-11 w-auto" />
+          <BrandLockup size={34} />
           <p className="mt-4 text-[13.5px] leading-relaxed text-lp-body dark:text-lp-dark-muted">
             {TAGLINE} An MVP demonstration built on mock SSS, PhilHealth, Pag-IBIG and PSA data.
           </p>

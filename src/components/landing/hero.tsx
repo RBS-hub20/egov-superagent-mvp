@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Lock, Sparkles } from "lucide-react";
+import { ICON } from "@/lib/brand";
 
 const AGENCIES = ["SSS", "PhilHealth", "Pag-IBIG", "PSA"];
 
@@ -32,9 +33,9 @@ export function Hero() {
         >
           {/* Blue backlight. Dialled right down in light mode — on white it
               would read as a grey smudge — and full strength in dark, where it
-              lifts the navy half of the wordmark off the near-black canvas. */}
+              lifts the navy tile off the near-black canvas. */}
           <div
-            className="lp-glow-pulse pointer-events-none absolute left-1/2 top-1/2 h-[300px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[110px] dark:opacity-100"
+            className="lp-glow-pulse pointer-events-none absolute left-1/2 top-1/2 h-[240px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-[90px] dark:opacity-100"
             style={{
               background:
                 "radial-gradient(closest-side, rgba(59,130,246,0.42) 0%, rgba(15,70,243,0.22) 55%, transparent 100%)",
@@ -43,21 +44,21 @@ export function Hero() {
           />
           {/* Warm pulse behind the Philippine sun inside the mark. */}
           <div
-            className="lp-sun-pulse pointer-events-none absolute left-1/2 top-[26%] h-[130px] w-[130px] -translate-x-1/2 rounded-full opacity-50 blur-[42px] dark:opacity-100"
+            className="lp-sun-pulse pointer-events-none absolute left-1/2 top-1/2 h-[86px] w-[86px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-50 blur-[34px] dark:opacity-100"
             style={{ background: "radial-gradient(circle, rgba(255,199,0,0.75) 0%, transparent 70%)" }}
             aria-hidden
           />
 
           <Image
-            src="/logo.png"
+            src={ICON}
             alt="eGov SuperAgent"
-            width={1040}
-            height={513}
+            width={512}
+            height={512}
             priority
-            sizes="(max-width: 768px) 380px, 520px"
+            sizes="(max-width: 768px) 132px, 168px"
             // A neutral drop shadow greys the artwork on white, so the light
             // theme gets a blue-tinted one and dark gets a glow.
-            className="lp-float relative w-[380px] max-w-full [filter:drop-shadow(0_16px_26px_rgba(15,70,243,0.16))] dark:[filter:drop-shadow(0_0_30px_rgba(59,130,246,0.32))] md:w-[520px]"
+            className="lp-float relative h-[132px] w-[132px] max-w-full [filter:drop-shadow(0_16px_26px_rgba(15,70,243,0.16))] dark:[filter:drop-shadow(0_0_30px_rgba(59,130,246,0.32))] md:h-[168px] md:w-[168px]"
           />
         </motion.div>
 

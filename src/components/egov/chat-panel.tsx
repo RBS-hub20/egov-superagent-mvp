@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { AppIcon } from "@/components/brand/app-icon";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { IdCard, PanelRight, Sparkles, User as UserIcon } from "lucide-react";
@@ -43,7 +43,7 @@ const nextId = () => `m${++counter}-${Date.now().toString(36)}`;
 function AgentAvatar() {
   return (
     <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-lp-line bg-white dark:border-lp-dark-line dark:bg-white/[0.06]">
-      <Image src="/logo-icon.png" alt="" width={64} height={39} className="h-4 w-auto" />
+      <AppIcon size={18} />
     </span>
   );
 }

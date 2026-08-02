@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
+import { AppIcon } from "@/components/brand/app-icon";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -112,7 +112,7 @@ export function OwnerConsole() {
       <header className="border-b border-white/[0.07] bg-[#0A0A0B]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <Image src="/logo-icon.png" alt="" width={96} height={58} className="h-7 w-auto" />
+            <AppIcon size={28} />
             <div>
               <p className="text-[15px] font-bold tracking-tight text-white">
                 eGov SuperAgent — Owner Console

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { ConsoleLogo } from "@/components/egov/console-logo";
+import { AppIcon } from "@/components/brand/app-icon";
 import { isOnboarded } from "@/lib/onboarding";
 
 /**
@@ -31,7 +31,7 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
     return (
       <div className="lp-canvas flex h-[100dvh] items-center justify-center">
         <span className="animate-pulse">
-          <ConsoleLogo width={160} />
+          <AppIcon size={64} priority />
         </span>
       </div>
     );

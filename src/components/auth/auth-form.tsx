@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Loader2, Mail, Phone, ShieldCheck } from "lucide-react";
@@ -81,7 +81,7 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
     <div className="flex min-h-[100dvh] flex-col bg-white">
       <header className="flex items-center justify-between px-5 pt-6 sm:px-6">
         <Link href="/" aria-label="eGov SuperAgent home">
-          <Image src="/logo.png" alt="eGov SuperAgent" width={520} height={257} className="h-9 w-auto" />
+          <BrandLockup size={32} priority />
         </Link>
         <Link
           href="/"

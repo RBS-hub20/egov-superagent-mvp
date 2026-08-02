@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu } from "lucide-react";
 import { ChatPanel } from "./chat-panel";
 import { ConnectIdModal } from "./connect-id-modal";
-import { ConsoleLogo } from "./console-logo";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 import { InsightRail } from "./insight-rail";
 import { LogsModal } from "./logs-modal";
 import { Sidebar } from "./sidebar";
@@ -47,7 +47,7 @@ export function AppShell() {
         >
           <Menu className="h-4 w-4" />
         </button>
-        <ConsoleLogo width={112} />
+        <BrandLockup size={26} priority />
       </header>
 
       <div className="flex min-h-0 flex-1">
