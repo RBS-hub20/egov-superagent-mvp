@@ -83,7 +83,7 @@ export function Hero() {
           className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
         >
           <Link
-            href="/app"
+            href="/intro"
             className="lp-shimmer group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-lp-primary px-8 py-4 text-lg font-semibold text-white shadow-[0_0_20px_rgba(15,70,243,0.4)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(15,70,243,0.6)]"
           >
             <span className="relative z-10">Launch SuperAgent</span>

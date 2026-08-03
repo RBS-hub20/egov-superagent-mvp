@@ -9,7 +9,6 @@ import { AppIcon } from "@/components/brand/app-icon";
 import { BrandLockup } from "@/components/brand/brand-lockup";
 import { UtusanIllustration, VaultIllustration } from "@/components/onboarding/illustrations";
 import { LICENSEE } from "@/lib/brand";
-import { completeOnboarding, isOnboarded } from "@/lib/onboarding";
 
 const SLIDES = [
   {
@@ -38,20 +37,10 @@ export function IntroScreen() {
   const router = useRouter();
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [ready, setReady] = useState(false);
   // Autoplay stops for good once someone takes control.
   const interacted = useRef(false);
 
   const slide = SLIDES[index];
-
-  // A returning visitor goes straight to the app.
-  useEffect(() => {
-    if (isOnboarded()) {
-      router.replace("/app");
-      return;
-    }
-    setReady(true);
-  }, [router]);
 
   const goTo = useCallback((next: number, dir: number) => {
     setDirection(dir);
@@ -67,12 +56,11 @@ export function IntroScreen() {
   );
 
   useEffect(() => {
-    if (!ready) return;
     const id = setInterval(() => {
       if (!interacted.current) goTo(index + 1, 1);
     }, AUTOPLAY_MS);
     return () => clearInterval(id);
-  }, [ready, index, goTo]);
+  }, [index, goTo]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -84,26 +72,24 @@ export function IntroScreen() {
   }, [index, take]);
 
   function proceed(href: string) {
-    completeOnboarding();
     router.push(href);
-  }
-
-  if (!ready) {
-    return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-white">
-        <span className="animate-pulse">
-          <AppIcon size={64} priority />
-        </span>
-      </div>
-    );
   }
 
   return (
     // Always white: the intro sits next to government apps on a first-time
     // visitor's phone, so it ignores the dark theme the rest of the app offers.
     <div className="flex min-h-[100dvh] flex-col bg-white">
-      <header className="flex justify-center pt-8 sm:pt-10">
-        <BrandLockup size={34} priority textClassName="text-[#0A1931]" />
+      <header className="flex items-center justify-between px-5 pt-7 sm:px-8 sm:pt-9">
+        <Link href="/" aria-label="eGov SuperAgent home">
+          <BrandLockup size={32} priority textClassName="text-[#0A1931]" />
+        </Link>
+        {/* Skip goes to the console, not past a gate — there is no gate. */}
+        <Link
+          href="/app"
+          className="rounded-lg px-3 py-2 text-[13.5px] font-semibold text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+        >
+          Skip
+        </Link>
       </header>
 
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-6">
@@ -178,7 +164,7 @@ export function IntroScreen() {
           </p>
 
           <p className="mt-5 text-center text-[13px]">
-            <Link href="/product" className="text-slate-400 transition hover:text-slate-600">
+            <Link href="/" className="text-slate-400 transition hover:text-slate-600">
               What is eGov SuperAgent?
             </Link>
           </p>

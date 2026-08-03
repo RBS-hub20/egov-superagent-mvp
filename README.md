@@ -21,10 +21,10 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 
 | Route | What it is |
 | --- | --- |
-| `/` | Intro — three auto-advancing slides, Sign Up Free / Login. Always white; a returning visitor is sent to `/app` |
-| `/product` | Marketing landing — hero, Why SuperAgent, services bento, Anti-Fixer Receipt (light/dark) |
+| `/` | Landing — hero, Why SuperAgent, services bento, Anti-Fixer Receipt (light/dark). **Launch SuperAgent** goes to `/intro` |
+| `/intro` | Three auto-advancing slides with dots and Skip → Sign Up Free, Login, or straight to the console. Always white |
 | `/app/signup`, `/app/login` | Phone or email, one-time code |
-| `/onboarding` | First-run intro — three swipeable slides, shown once per browser |
+| `/product`, `/onboarding` | Legacy paths — redirect to `/` and `/intro` |
 | `/app` | The console — same theme as the landing: sidebar, chat with generative UI, vault + receipt + memory rail |
 | `/admin` | Owner console — eTravel queue, Bayad Center, PSA deliveries, logs, settings. Password-gated |
 | `/admin/login` | Password entry for the console |
@@ -69,6 +69,7 @@ public/og.png                 1200x630 social card, generated from the same tile
 public/logos/                 favicon sizes + earlier kit exports (source/ holds the originals)
 src/app/
   ├─ page.tsx                 landing
+  ├─ intro/page.tsx           three-slide intro
   ├─ app/page.tsx             console
   ├─ api/webhook/messenger/   Messenger webhook
   ├─ layout.tsx               metadata, favicons, OG
@@ -77,7 +78,7 @@ src/components/
   ├─ admin/                   owner console: queue, filing modal, order tables, logs, settings
   ├─ cards/                   ETravelCard + the review → registered flow
   ├─ verify/                  record check screen
-  ├─ onboarding/            three-slide intro, its illustrations, and the /app gate
+  ├─ intro/                   the three slides and their illustrations
   ├─ brand/                   AppIcon + BrandLockup — the icon, and the icon with the name beside it
   ├─ landing/                 nav, hero, why, services bento, trust receipt, footer, background FX
   ├─ theme/                   ThemeProvider + pill toggle (localStorage 'egov-theme')
@@ -87,7 +88,6 @@ src/components/
   └─ egov/                    app shell, sidebar, chat panel, composer, memory graph
 src/lib/                      brand tokens, typed mock access, agent intents, vault crypto, PDF export
 src/lib/user.ts               guest-by-default identity store (localStorage 'egov-user')
-src/lib/onboarding.ts         first-run flag (localStorage 'egov-onboarded')
 src/lib/intents.ts            eTravel intent + Taglish date/flight parsing
 src/lib/etravel.ts            the six-agency checklist fixture + Manila date formatting
 src/lib/etravel-orders.ts     the order store — Supabase through the routes, or this browser
@@ -206,11 +206,15 @@ demo data.
 
 ## First run and accounts
 
-`/` is the intro: three slides that advance on their own every six seconds and
-stop the moment you swipe, tap a dot or use the arrow keys. It is always white —
-it sits beside government apps on a first-time visitor's phone. Sign Up Free and
-Login both set `egov-onboarded`, so every later visit opens `/app` directly.
-`/onboarding` redirects here for old links.
+`/` is the landing and stays the landing — no visit is ever redirected away from
+it. **Launch SuperAgent** opens `/intro`: three slides that advance on their own
+every six seconds and stop the moment you swipe, tap a dot or use the arrow
+keys. It is always white — it sits beside government apps on a first-time
+visitor's phone. From there, Sign Up Free, Login, or **Skip** straight into the
+console.
+
+`/app` is reachable directly and always renders the console. Nothing gates it,
+so nobody can be trapped behind an intro they have already seen.
 
 Sign-up takes a phone number or email and a one-time code:
 

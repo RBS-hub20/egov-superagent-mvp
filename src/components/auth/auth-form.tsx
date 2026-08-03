@@ -17,7 +17,6 @@ import {
   type Channel,
 } from "@/lib/auth";
 import { LICENSEE } from "@/lib/brand";
-import { completeOnboarding } from "@/lib/onboarding";
 
 type Step = "details" | "code";
 
@@ -72,7 +71,6 @@ export function AuthForm({ mode }: { mode: "signup" | "login" }) {
       return;
     }
     // Someone who has signed in has no need for the intro again.
-    completeOnboarding();
     router.replace("/app");
     router.refresh();
   }

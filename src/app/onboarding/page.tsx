@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// The three-slide intro moved to / when sign-up was added; keep old links alive.
+// The three-slide intro lives at /intro; keep old links alive.
 export default function OnboardingRedirect() {
-  redirect("/");
+  redirect("/intro");
 }

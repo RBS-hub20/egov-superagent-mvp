@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/egov/app-shell";
-import { OnboardingGate } from "@/components/onboarding/onboarding-gate";
 
 export const metadata: Metadata = {
   title: "SuperAgent Console",
@@ -10,9 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function SuperAgentAppPage() {
-  return (
-    <OnboardingGate>
-      <AppShell />
-    </OnboardingGate>
-  );
+  return <AppShell />;
 }
