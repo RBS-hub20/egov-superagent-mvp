@@ -9,10 +9,19 @@ import { Composer } from "./composer";
 import { ProactiveBanner } from "./proactive-banner";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { PhilHealthCard, PSATrackerCard, SSSContributionsCard } from "@/components/generative-ui";
-import { ETravelFlow } from "@/components/cards/etravel-flow";
+import { ETravelModal, type ETravelPrefill } from "@/components/cards/etravel-modal";
+import { ETravelOrderCard } from "@/components/cards/etravel-order-card";
 import { respond, type CardKind } from "@/lib/agent";
-import { buildDraft, markNotified, unnotifiedFilings, type ETravelDraft } from "@/lib/etravel";
+import {
+  listMyOrders,
+  markAnnounced,
+  subscribeOrders,
+  unannounced,
+  verifyPath,
+  type ETravelOrder,
+} from "@/lib/etravel-orders";
 import { AGENCIES, peso, phDate, sss } from "@/lib/data";
+import { LICENSEE } from "@/lib/brand";
 import { initialsOf, useUser } from "@/lib/user";
 
 interface Message {
@@ -21,8 +30,8 @@ interface Message {
   text: string;
   card: CardKind;
   suggestions?: string[];
-  /** Built from the message that triggered it, so each request has its own trip. */
-  etravel?: ETravelDraft;
+  /** Present on the turn that filed a declaration, so the card can track it. */
+  order?: { initial: ETravelOrder; accessKey: string };
 }
 
 const WELCOME: Message = {
@@ -48,11 +57,12 @@ function AgentAvatar() {
   );
 }
 
-function CardFor({ kind, etravel }: { kind: CardKind; etravel?: ETravelDraft }) {
+function CardFor({ kind, order }: { kind: CardKind; order?: Message["order"] }) {
   if (kind === "sss") return <SSSContributionsCard />;
   if (kind === "philhealth") return <PhilHealthCard />;
   if (kind === "psa") return <PSATrackerCard />;
-  if (kind === "etravel" && etravel) return <ETravelFlow draft={etravel} />;
+  if (kind === "etravel" && order)
+    return <ETravelOrderCard initial={order.initial} accessKey={order.accessKey} />;
   return null;
 }
 
@@ -86,14 +96,19 @@ function Working({ agencies }: { agencies: string[] }) {
 export function ChatPanel({
   onOpenRail,
   onConnectId,
+  etravelSignal = 0,
 }: {
   onOpenRail: () => void;
   onConnectId: () => void;
+  /** Bumped by the sidebar's Immigration tile to open the filing form. */
+  etravelSignal?: number;
 }) {
   const user = useUser();
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [working, setWorking] = useState<string[] | null>(null);
   const [bannerVisible, setBannerVisible] = useState(true);
+  const [etravelOpen, setETravelOpen] = useState(false);
+  const [prefill, setPrefill] = useState<ETravelPrefill>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const searchParams = useSearchParams();
@@ -107,12 +122,17 @@ export function ChatPanel({
   // Clear pending reply timers if the conversation unmounts mid-flight.
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
+  const openETravel = useCallback(
+    (next: ETravelPrefill) => {
+      setPrefill({ travelerName: user.verified ? user.name : "", ...next });
+      setETravelOpen(true);
+    },
+    [user.name, user.verified]
+  );
+
   const send = useCallback(
     (text: string) => {
       const turn = respond(text, { name: user.name, verified: user.verified });
-      const etravel = turn.etravel
-        ? buildDraft(turn.etravel, user.verified ? user.name : "Guest traveler")
-        : undefined;
       setMessages((prev) => [...prev, { id: nextId(), role: "user", text, card: null }]);
       setWorking(turn.working);
 
@@ -124,41 +144,71 @@ export function ChatPanel({
             {
               id: nextId(),
               role: "agent",
-              text: turn.reply,
-              card: turn.card,
-              suggestions: turn.suggestions,
-              etravel,
+              // The eTravel turn ends in a form, so nothing is rendered with it.
+              text: turn.etravel
+                ? "Nakuha ko na ang trip details mo — buksan mo lang ang form para sa kulang, tapos ipapasok ko na sa filing queue."
+                : turn.reply,
+              card: turn.etravel ? null : turn.card,
+              suggestions: turn.etravel ? undefined : turn.suggestions,
             },
           ]);
+          if (turn.etravel) {
+            openETravel({
+              destination: turn.etravel.destination,
+              flight: turn.etravel.flight,
+              departureISO: turn.etravel.departureDate
+                ? turn.etravel.departureDate.toISOString()
+                : null,
+            });
+          }
         },
         turn.card ? 900 : 600
       );
       timers.current.push(t);
     },
-    [user.name, user.verified]
+    [user.name, user.verified, openETravel]
   );
 
-  // When an operator files a declaration in the owner console, tell the
-  // traveller here. Polled because the console writes from another tab.
+  function onOrderCreated(order: ETravelOrder, accessKey: string) {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: nextId(),
+        role: "agent",
+        text: `Nasa queue na boss — ang eTravel mo ay ${order.ref}, pending filing by our VA. Ako na ang bahala; makikita mo dito kapag na-file na ito sa etravel.gov.ph.`,
+        card: "etravel",
+        order: { initial: order, accessKey },
+        suggestions: ["Track my PSA request", "Check my SSS contributions"],
+      },
+    ]);
+  }
+
+  // The sidebar's Immigration tile opens the same form.
   useEffect(() => {
-    function announce() {
-      const filed = unnotifiedFilings();
-      if (filed.length === 0) return;
+    if (etravelSignal > 0) openETravel({});
+  }, [etravelSignal, openETravel]);
+
+  // When an operator files a declaration in the owner console, tell the
+  // traveller here — driven by the same change feed the card listens to.
+  useEffect(() => {
+    async function announce() {
+      const orders = await listMyOrders();
+      const fresh = unannounced(orders);
+      if (fresh.length === 0) return;
       setMessages((prev) => [
         ...prev,
-        ...filed.map((record) => ({
+        ...fresh.map((order) => ({
           id: nextId(),
           role: "agent" as const,
-          text: `Boss, na-file na ang eTravel mo${record.flight ? ` para sa ${record.flight}` : ""} — official reference ${record.filing?.govReference}. Nasa /verify/${record.reference} ang kopya. Ito ay naitala ng AXLA operator na na-file na sa etravel.gov.ph.`,
+          text: `Boss, na-file na ang eTravel mo${order.flight_no ? ` para sa ${order.flight_no}` : ""} — official reference ${order.official_ref}. Nasa ${verifyPath(order)} ang kopya. Ito ay naitala ng ${LICENSEE.short} operator na na-file na sa etravel.gov.ph.`,
           card: null,
           suggestions: ["Track my PSA request", "Check my SSS contributions"],
         })),
       ]);
-      filed.forEach((record) => markNotified(record.reference));
+      markAnnounced(fresh.map((o) => o.ref));
     }
-    announce();
-    const id = setInterval(announce, 8000);
-    return () => clearInterval(id);
+    void announce();
+    return subscribeOrders(() => void announce());
   }, []);
 
   // A service tile on the landing page can deep-link a first utos: /app?q=…
@@ -271,7 +321,7 @@ export function ChatPanel({
                       {m.text}
                     </div>
                   ) : null}
-                  {m.card ? <CardFor kind={m.card} etravel={m.etravel} /> : null}
+                  {m.card ? <CardFor kind={m.card} order={m.order} /> : null}
                   {m.suggestions?.length ? (
                     <div className="flex flex-wrap gap-2 pt-0.5">
                       {m.suggestions.map((s) => (
@@ -314,6 +364,13 @@ export function ChatPanel({
       <div className="mx-auto w-full max-w-3xl">
         <Composer onSend={send} disabled={working !== null} />
       </div>
+
+      <ETravelModal
+        open={etravelOpen}
+        prefill={prefill}
+        onClose={() => setETravelOpen(false)}
+        onCreated={onOrderCreated}
+      />
     </div>
   );
 }

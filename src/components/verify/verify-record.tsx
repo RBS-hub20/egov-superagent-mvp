@@ -1,17 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { ArrowLeft, BadgeCheck, HelpCircle, Plane, ReceiptText } from "lucide-react";
 import { BrandLockup } from "@/components/brand/brand-lockup";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LICENSEE } from "@/lib/brand";
 import { RECEIPT, peso, phDate } from "@/lib/data";
-import { findByReference, formatTravelDate, type ETravelRecord } from "@/lib/etravel";
+import { formatShortDate, formatTime, formatTravelDate } from "@/lib/etravel";
+import {
+  claimFor,
+  getOrder,
+  subscribeOrders,
+  type ETravelOrder,
+} from "@/lib/etravel-orders";
 
 type Result =
-  | { kind: "etravel"; record: ETravelRecord }
+  | { kind: "etravel"; record: ETravelOrder }
   | { kind: "receipt" }
   | { kind: "unknown" }
   | { kind: "loading" };
@@ -30,12 +37,14 @@ function Row({ label, value }: { label: string; value: string }) {
 export function VerifyRecord({ id }: { id: string }) {
   const [result, setResult] = useState<Result>({ kind: "loading" });
   const reference = decodeURIComponent(id).trim().toUpperCase();
+  const searchParams = useSearchParams();
+  // The key travels in the link. Without it this page shows status only.
+  const accessKey = searchParams?.get("k") ?? claimFor(reference)?.accessKey ?? undefined;
 
-  useEffect(() => {
-    // Records live in the browser that created them — there is no server to ask.
-    if (reference.startsWith("ETR-PH-")) {
-      const record = findByReference(reference);
-      setResult(record ? { kind: "etravel", record } : { kind: "unknown" });
+  const load = useCallback(async () => {
+    const order = await getOrder(reference, accessKey);
+    if (order) {
+      setResult({ kind: "etravel", record: order });
       return;
     }
     if (reference === RECEIPT.trackingNumber.toUpperCase()) {
@@ -43,7 +52,14 @@ export function VerifyRecord({ id }: { id: string }) {
       return;
     }
     setResult({ kind: "unknown" });
-  }, [reference]);
+  }, [reference, accessKey]);
+
+  // A traveller keeps this page open while an operator files; follow the change
+  // feed so the badge flips without a refresh.
+  useEffect(() => {
+    void load();
+    return subscribeOrders(() => void load());
+  }, [load]);
 
   return (
     <div className="lp-canvas min-h-[100dvh]">
@@ -77,15 +93,17 @@ export function VerifyRecord({ id }: { id: string }) {
 
         {result.kind === "etravel" ? (
           <>
-            {result.record.filing?.status === "filed" ? (
+            {result.record.status === "FILED" ? (
               <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3.5 py-1.5 text-[12.5px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-500/25 dark:text-emerald-400">
                 <BadgeCheck className="h-4 w-4" />
-                Filed with the Bureau of Immigration
+                Filed to the Bureau of Immigration
               </div>
             ) : (
               <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3.5 py-1.5 text-[12.5px] font-bold text-amber-700 ring-1 ring-inset ring-amber-500/25 dark:text-amber-400">
                 <HelpCircle className="h-4 w-4" />
-                Demo record — not filed yet
+                {result.record.status === "FILING"
+                  ? "An operator is filing this now"
+                  : "Pending filing — not yet with the agency"}
               </div>
             )}
 
@@ -96,36 +114,69 @@ export function VerifyRecord({ id }: { id: string }) {
                   eTravel departure declaration
                 </p>
               </div>
-              <Row label="Traveler" value={`${result.record.travelerName} • ${result.record.nationality}`} />
-              <Row label="Direction" value={result.record.direction} />
-              <Row label="Route" value={result.record.route} />
-              <Row label="Flight" value={result.record.flight ?? "Not specified"} />
-              <Row label="Travel date" value={formatTravelDate(result.record.departureISO)} />
-              {result.record.returnISO ? (
-                <Row label="Return date" value={formatTravelDate(result.record.returnISO)} />
+              <Row label="Traveler" value={result.record.traveler_name} />
+              {result.record.passport_no ? (
+                <Row label="Passport" value={result.record.passport_no} />
               ) : null}
-              <Row label="Departure port" value={result.record.port} />
-              {result.record.filing?.status === "filed" ? (
+              <Row label="Flight" value={result.record.flight_no ?? "Not specified"} />
+              <Row label="Destination" value={result.record.destination} />
+              <Row
+                label="Travel date"
+                value={
+                  result.record.departure_date
+                    ? `${formatShortDate(result.record.departure_date)} ${formatTime(result.record.departure_date)}`
+                    : "Not specified"
+                }
+              />
+              <Row label="Departure port" value={result.record.departure_airport} />
+              {result.record.status === "FILED" ? (
                 <>
-                  <Row
-                    label="Official reference"
-                    value={result.record.filing.govReference ?? "—"}
-                  />
+                  <Row label="Official reference" value={result.record.official_ref ?? "—"} />
                   <Row
                     label="Filed"
                     value={
-                      result.record.filing.filedAt
-                        ? `${formatTravelDate(result.record.filing.filedAt)} • ${result.record.filing.filedBy ?? "operator"}`
+                      result.record.filed_at
+                        ? `${formatTravelDate(result.record.filed_at)} • ${result.record.filed_by ?? "operator"}`
                         : "—"
                     }
                   />
                 </>
               ) : null}
 
-              <div className="mt-4 flex justify-center border-t border-lp-line pt-4 dark:border-lp-dark-line">
-                <div className="rounded-xl bg-white p-2 ring-1 ring-lp-line dark:ring-lp-dark-line">
-                  <QRCodeSVG value={result.record.reference} size={116} level="M" fgColor="#0A1931" />
-                </div>
+              <div className="mt-4 flex flex-col items-center gap-3 border-t border-lp-line pt-4 dark:border-lp-dark-line">
+                {result.record.qr_url ? (
+                  <>
+                    {/* The agency's own QR, once an operator has uploaded it. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={result.record.qr_url}
+                      alt="Official eTravel QR issued by the agency"
+                      className="max-h-[220px] w-auto rounded-xl ring-1 ring-lp-line dark:ring-lp-dark-line"
+                    />
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-600 dark:text-emerald-400">
+                      Official agency QR
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="rounded-xl bg-white p-2 ring-1 ring-lp-line dark:ring-lp-dark-line">
+                      <QRCodeSVG value={result.record.ref} size={116} level="M" fgColor="#0A1931" />
+                    </div>
+                    <p className="text-[11px] text-lp-body/60 dark:text-lp-dark-muted/70">
+                      This code is the SuperAgent reference, not an agency QR.
+                    </p>
+                  </>
+                )}
+                {result.record.pdf_url ? (
+                  <a
+                    href={result.record.pdf_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[12px] font-semibold text-lp-primary hover:underline"
+                  >
+                    Open the agency PDF
+                  </a>
+                ) : null}
               </div>
             </section>
 
@@ -133,12 +184,12 @@ export function VerifyRecord({ id }: { id: string }) {
               Bureau of Immigration lane • Built by {LICENSEE.short}
             </p>
 
-            {result.record.filing?.status === "filed" ? (
+            {result.record.status === "FILED" ? (
               <p className="mt-3 rounded-xl bg-emerald-500/[0.07] p-3 text-[12px] leading-relaxed text-emerald-800 ring-1 ring-inset ring-emerald-500/20 dark:text-emerald-400">
-                An AXLA operator recorded that this declaration was filed on etravel.gov.ph under
-                reference {result.record.filing.govReference}. That is their attestation — this page
-                does not query the Bureau of Immigration. Check the official reference on the
-                agency&apos;s own site before you travel.
+                An {LICENSEE.short} operator recorded that this declaration was filed on
+                etravel.gov.ph under reference {result.record.official_ref}. That is their
+                attestation — this page does not query the Bureau of Immigration. Check the official
+                reference on the agency&apos;s own site before you travel.
               </p>
             ) : null}
           </>
@@ -174,9 +225,8 @@ export function VerifyRecord({ id }: { id: string }) {
               Not found on this device
             </div>
             <p className="mt-4 text-[14.5px] leading-relaxed text-lp-body dark:text-lp-dark-muted">
-              This MVP keeps every record in the browser that created it — there is no server to
-              ask. Open this link on the device that produced the declaration, or file a new one in
-              the console.
+              No declaration carries this reference. Check the characters, open the link that was
+              issued with it, or file a new declaration in the console.
             </p>
             <Link
               href="/app"
@@ -188,9 +238,9 @@ export function VerifyRecord({ id }: { id: string }) {
         ) : null}
 
         <p className="mt-10 border-t border-lp-line pt-5 text-[11.5px] leading-relaxed text-lp-body/60 dark:border-lp-dark-line dark:text-lp-dark-muted/70">
-          Records live in the browser that created them; this page reads that store rather than an
-          agency system. Anything not marked as filed by an operator was generated for
-          demonstration and was never submitted to any agency. Built by {LICENSEE.short}.
+          This page reads {LICENSEE.short}&apos;s own filing queue, not an agency system. A
+          declaration counts as filed only when an operator has recorded the reference the agency
+          returned; anything pending has been submitted to nobody. Built by {LICENSEE.short}.
         </p>
       </main>
     </div>

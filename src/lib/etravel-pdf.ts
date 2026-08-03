@@ -2,20 +2,26 @@
 
 import jsPDF from "jspdf";
 import { LICENSEE } from "./brand";
-import { formatTravelDate, type ETravelDraft, type ETravelSubmission } from "./etravel";
+import { formatTravelDate } from "./etravel";
+import { statusLabel, type ETravelOrder } from "./etravel-orders";
 
 const NAVY: [number, number, number] = [10, 25, 49];
 const BLUE: [number, number, number] = [15, 70, 243];
 const MUTED: [number, number, number] = [100, 116, 139];
 
 /**
- * Builds the declaration PDF in memory and returns a blob URL.
+ * Builds the declaration summary in memory and returns a blob URL.
  *
- * The QR is printed as its payload string rather than a scannable square —
- * jsPDF has no QR encoder and the stack is deliberately small. The on-screen
- * card carries the real scannable code.
+ * This is the traveller's copy of what was submitted to the queue — a document
+ * to hand an operator or keep on a phone, not an agency record. Once a filing
+ * is done the agency's own PDF is attached to the order and takes over; the
+ * footer here says which one this is so the two never get confused.
+ *
+ * The verify link is printed as text rather than a scannable square: jsPDF has
+ * no QR encoder and the stack is deliberately small. The on-screen card carries
+ * the real code.
  */
-export function buildETravelPdfUrl(draft: ETravelDraft, result: ETravelSubmission): string {
+export function buildETravelPdfUrl(order: ETravelOrder, verifyUrl: string): string {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const width = doc.internal.pageSize.getWidth();
 
@@ -27,7 +33,7 @@ export function buildETravelPdfUrl(draft: ETravelDraft, result: ETravelSubmissio
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(17);
-  doc.text("eTravel QR Declaration", 40, 42);
+  doc.text("eTravel Declaration Summary", 40, 42);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(200, 214, 240);
@@ -35,18 +41,18 @@ export function buildETravelPdfUrl(draft: ETravelDraft, result: ETravelSubmissio
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
   doc.setTextColor(255, 255, 255);
-  doc.text(result.reference, width - 40, 42, { align: "right" });
+  doc.text(order.ref, width - 40, 42, { align: "right" });
 
   let y = 140;
   const rows: [string, string][] = [
-    ["Traveler", `${draft.travelerName} • ${draft.nationality}`],
-    ["Direction", draft.direction],
-    ["Route", draft.route],
-    ["Flight", draft.flight ?? "Not specified"],
-    ["Departure port", draft.port],
-    ["Travel date", formatTravelDate(draft.departureISO)],
-    ["Return date", draft.returnISO ? formatTravelDate(draft.returnISO) : "One way"],
-    ["Status", "Registered"],
+    ["Traveler", order.traveler_name],
+    ["Passport", order.passport_no ?? "Not provided"],
+    ["Flight", order.flight_no ?? "Not specified"],
+    ["Destination", order.destination],
+    ["Departure port", order.departure_airport],
+    ["Travel date", formatTravelDate(order.departure_date)],
+    ["Status", statusLabel(order.status)],
+    ["Official reference", order.official_ref ?? "Not filed yet"],
   ];
   rows.forEach(([label, value]) => {
     doc.setFont("helvetica", "normal");
@@ -66,10 +72,10 @@ export function buildETravelPdfUrl(draft: ETravelDraft, result: ETravelSubmissio
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
   doc.setTextColor(...NAVY);
-  doc.text("Present this code at the eTravel counter", 56, y + 36);
+  doc.text("Check the live status of this declaration", 56, y + 36);
   doc.setFont("courier", "normal");
-  doc.setFontSize(10);
-  doc.text(result.qrPayload, 56, y + 58, { maxWidth: width - 112 });
+  doc.setFontSize(9);
+  doc.text(verifyUrl, 56, y + 58, { maxWidth: width - 112 });
 
   const height = doc.internal.pageSize.getHeight();
   doc.setDrawColor(226, 232, 240);
@@ -78,7 +84,9 @@ export function buildETravelPdfUrl(draft: ETravelDraft, result: ETravelSubmissio
   doc.setFontSize(8);
   doc.setTextColor(...MUTED);
   doc.text(
-    `Built by ${LICENSEE.name} — demo record generated on this device, not filed with any agency.`,
+    order.status === "FILED"
+      ? `Built by ${LICENSEE.name}. Filed on etravel.gov.ph by an operator under ${order.official_ref}; this sheet is the traveller's summary, not the agency's own document.`
+      : `Built by ${LICENSEE.name}. This declaration is queued for filing and has not been submitted to any agency yet.`,
     40,
     height - 44,
     { maxWidth: width - 80 }

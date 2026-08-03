@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { motion } from "framer-motion";
 import { BrainCircuit, IdCard, Lock, LogOut, Plus, ScrollText, User as UserIcon, X } from "lucide-react";
 import { BrandLockup } from "@/components/brand/brand-lockup";
@@ -15,6 +16,7 @@ export function Sidebar({
   onOpenVault,
   onOpenLogs,
   onConnectId,
+  onFileETravel,
   onClose,
 }: {
   onNewConversation: () => void;
@@ -22,6 +24,8 @@ export function Sidebar({
   onOpenVault: () => void;
   onOpenLogs: () => void;
   onConnectId: () => void;
+  /** Immigration is the one agency that files something, so its tile acts. */
+  onFileETravel: () => void;
   /** Present only when the sidebar is rendered as a mobile drawer. */
   onClose?: () => void;
 }) {
@@ -70,7 +74,27 @@ export function Sidebar({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.32, delay: 0.05 * i }}
             >
-              <div className="flex items-center gap-2.5 rounded-xl border border-lp-line bg-white/70 px-3 py-2.5 transition hover:border-lp-primary/30 hover:bg-white dark:border-lp-dark-line dark:bg-white/[0.03] dark:hover:border-lp-primary/40 dark:hover:bg-white/[0.06]">
+              <div
+                {...(agency.id === "immigration"
+                  ? {
+                      role: "button" as const,
+                      tabIndex: 0,
+                      onClick: onFileETravel,
+                      onKeyDown: (e: ReactKeyboardEvent<HTMLDivElement>) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onFileETravel();
+                        }
+                      },
+                      "aria-label": "File an eTravel declaration",
+                    }
+                  : {})}
+                className={cn(
+                  "flex items-center gap-2.5 rounded-xl border border-lp-line bg-white/70 px-3 py-2.5 transition hover:border-lp-primary/30 hover:bg-white dark:border-lp-dark-line dark:bg-white/[0.03] dark:hover:border-lp-primary/40 dark:hover:bg-white/[0.06]",
+                  agency.id === "immigration" &&
+                    "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lp-primary/40"
+                )}
+              >
                 <span
                   className={cn(
                     "h-2 w-2 shrink-0 rounded-full",
@@ -87,7 +111,11 @@ export function Sidebar({
                   </p>
                 </div>
                 <span className="shrink-0 text-[10.5px] font-semibold text-emerald-600 dark:text-emerald-400">
-                  {agency.connected ? "Connected" : "Off"}
+                  {agency.id === "immigration"
+                    ? "File eTravel"
+                    : agency.connected
+                      ? "Connected"
+                      : "Off"}
                 </span>
               </div>
             </motion.li>

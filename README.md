@@ -28,7 +28,9 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 | `/app` | The console — same theme as the landing: sidebar, chat with generative UI, vault + receipt + memory rail |
 | `/admin` | Owner console — eTravel queue, Bayad Center, PSA deliveries, logs, settings. Password-gated |
 | `/admin/login` | Password entry for the console |
-| `/verify/[id]` | Record check for an `ETR-PH-…` declaration or the `EGOV-…` receipt — device-local, noindex |
+| `/verify/[id]` | Record check for an `EGOV-…` declaration — status for anyone holding the reference, the full record with its access key. noindex |
+| `/api/etravel/orders` | `POST` files a declaration into the queue; `GET /[ref]` reads one back (status only without its access key) |
+| `/api/admin/etravel` | The queue and the filing endpoint, both behind the admin cookie |
 | `/api/webhook/messenger` | `POST` logs the payload and returns `{ ok: true }`; `GET` completes the `hub.challenge` handshake when `MESSENGER_VERIFY_TOKEN` matches |
 
 ## Run it
@@ -44,8 +46,10 @@ npm run typecheck            # tsc --noEmit
 npm run lint                 # next lint
 ```
 
-No database, no auth, no API keys — `npm install && npm run dev` is the whole
-setup.
+`npm install && npm run dev` is the whole setup: with no environment variables
+the app runs against mock data and a device-local filing queue. Point it at a
+Supabase project (see `.env.example`) and the eTravel queue becomes a real one —
+apply `supabase/migrations` first.
 
 ## Stack
 
@@ -57,7 +61,8 @@ Deliberately nothing else.
 ## Layout of the code
 
 ```
-mocks/                        sss.json, philhealth.json, psa.json, etravel.json — the only data source
+supabase/migrations/          the eTravel queue schema: table, RLS, change feed, storage bucket
+mocks/                        sss.json, philhealth.json, psa.json, etravel.json — everything except eTravel
 public/icon.png               the app icon — the only mark the UI loads (logo.png, logo-icon.png are copies)
 public/apple-touch-icon.png   180px, opaque navy behind the rounded corners
 public/og.png                 1200x630 social card, generated from the same tile
@@ -84,7 +89,10 @@ src/lib/                      brand tokens, typed mock access, agent intents, va
 src/lib/user.ts               guest-by-default identity store (localStorage 'egov-user')
 src/lib/onboarding.ts         first-run flag (localStorage 'egov-onboarded')
 src/lib/intents.ts            eTravel intent + Taglish date/flight parsing
-src/lib/etravel.ts            draft, reference, mock submission, history
+src/lib/etravel.ts            the six-agency checklist fixture + Manila date formatting
+src/lib/etravel-orders.ts     the order store — Supabase through the routes, or this browser
+src/lib/etravel-service.ts    server side: service-role client, redaction, signed URLs
+src/lib/passport.ts           passport number kept in the encrypted vault, not localStorage
 src/lib/etravel-pdf.ts        the declaration PDF, built client-side
 src/lib/orders.ts             Bayad/PSA orders for the console
 src/lib/admin-auth.ts         console password check + cookie token
@@ -143,23 +151,44 @@ Bureau of Immigration (departure record) and TIEZA (travel tax). The AXLA
 receipt is issued too — it is listed under the steps rather than counted, since
 AXLA is the builder, not an agency.
 
-The review card shows what would be filed; submitting produces a reference
-(`ETR-PH-YYMMDD-####`, dated by departure), a scannable QR, a PDF built on the
-device, and a row in `etravel-history`. Sidebar → **Logs** lists them, and each
-links to `/verify/<reference>`.
+### The filing queue
 
-**Nothing is filed with anyone.** `submitETravel()` returns mock data and says
-so in the code; the intended path — a server-side Playwright session against
-etravel.gov.ph with a human dashboard for the cases it can't finish — is a TODO
-in that file. Every surface that shows a record says it is a demo.
+The parsed trip opens a form — chat can also be skipped entirely by tapping
+**Immigration** in the sidebar. Submitting it writes an order with a reference
+of its own (`EGOV-YYYY-NNNN`) at status **PENDING**, and the chat says pending
+filing by a VA rather than pretending anything reached an agency. The card in
+chat, sidebar → **Logs**, and `/verify/<ref>` are three views of that one row.
+
+From there:
+
+| Status | What it means |
+| --- | --- |
+| `PENDING` | In the queue. Submitted to nobody. |
+| `FILING` | An operator has it open on etravel.gov.ph right now. |
+| `FILED` | The agency returned a reference and the operator recorded it. |
+
+The status moves in the traveller's console without a refresh, and the agent
+announces the filing in chat when it lands.
+
+**With Supabase configured** the order is a row in Postgres, the owner console
+picks it up over Realtime, and the agency's QR and PDF are uploaded to a private
+bucket and handed back as short-lived signed URLs. **Without it** the same flow
+runs against a device-local store — useful for a demo, but the queue is then
+only what that one browser filed, and the console header says exactly that.
+
+Filing still needs a person: an operator completes the form on etravel.gov.ph
+and records what came back. Nothing in this app submits to the agency by itself.
 
 ## Owner console
 
-`/admin` is where an operator turns a demo declaration into a real one. The
-eTravel queue lists everything the app has drafted; **File now** opens the
-agency site, offers each traveller field with a copy button, and takes back the
-official reference, the QR screenshot and any notes. Marking it filed moves the
-row to **FILED**, tells the traveller in chat, and updates `/verify`.
+`/admin` is where an operator turns a pending declaration into a filed one. The
+eTravel queue lists the whole backlog and subscribes to changes; **File now**
+opens the agency site, offers each traveller field with a copy button — the
+passport number in full, since that is what has to be typed in — and takes back
+the official reference, the QR screenshot, the agency PDF and any notes. Marking
+it filed moves the row through **FILING** to **FILED**, tells the traveller in
+chat, and updates `/verify`. The log records the attestation as one line:
+*Operator attests filed on etravel.gov.ph at HH:MM*.
 
 Access is gated server-side: the password is checked in an API route against
 `ADMIN_PASSWORD` and the resulting cookie is httpOnly and carries a hash of that
@@ -232,6 +261,8 @@ clicking a row decrypts it back into a download.
 
    | Name | When you need it |
    | --- | --- |
+   | `ADMIN_PASSWORD` | Always. Without it the owner console falls back to a default that is public in this repository. |
+   | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | To make the eTravel queue and accounts real rather than device-local. Apply `supabase/migrations` to the project first. |
    | `NEXT_PUBLIC_SITE_URL` | Preview deployments, so canonical/OG/sitemap URLs point at the preview instead of the live domain. Production can leave it unset. |
    | `MESSENGER_VERIFY_TOKEN` | Only to complete the Messenger webhook handshake. |
 
@@ -263,7 +294,13 @@ landing footer, the console sidebar, the Anti-Fixer Receipt, and as
 
 ## Scope
 
-Everything on screen is mock data from `/mocks`. There is no SSS, PhilHealth,
-Pag-IBIG or PSA integration, no Viber channel, and no blockchain. Messenger is
-plumbed but not handled. This is a demonstration build and is not affiliated
-with any Philippine government agency.
+SSS, PhilHealth, Pag-IBIG and PSA are mock data from `/mocks` — there is no
+integration with any of them, no Viber channel, and no blockchain. Messenger is
+plumbed but not handled.
+
+eTravel is the exception and the only real pipeline here: a declaration is a
+durable record that an operator works and attests to. Even so, no software in
+this repository submits anything to the Bureau of Immigration — a person does
+that on etravel.gov.ph, and every surface distinguishes their attestation from
+an agency lookup. This build is not affiliated with any Philippine government
+agency.

@@ -17,6 +17,14 @@ export function AppShell() {
   const [railOpen, setRailOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
   const [logsOpen, setLogsOpen] = useState(false);
+  // Bumped rather than boolean: two taps in a row should reopen the form.
+  const [etravelSignal, setETravelSignal] = useState(0);
+
+  function fileETravel() {
+    setNavOpen(false);
+    setRailOpen(false);
+    setETravelSignal((n) => n + 1);
+  }
 
   function openConnect() {
     setNavOpen(false);
@@ -63,6 +71,7 @@ export function AppShell() {
             onOpenVault={() => setRailOpen(true)}
             onOpenLogs={openLogs}
             onConnectId={openConnect}
+            onFileETravel={fileETravel}
           />
         </motion.aside>
 
@@ -72,6 +81,7 @@ export function AppShell() {
               key={conversationKey}
               onOpenRail={() => setRailOpen(true)}
               onConnectId={openConnect}
+              etravelSignal={etravelSignal}
             />
           </Suspense>
         </main>
@@ -120,6 +130,7 @@ export function AppShell() {
                 }}
                 onOpenLogs={openLogs}
                 onConnectId={openConnect}
+                onFileETravel={fileETravel}
                 onClose={() => setNavOpen(false)}
               />
             </motion.div>

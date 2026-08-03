@@ -5,7 +5,14 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink, Plane, ReceiptText, ScrollText, X } from "lucide-react";
 import { RECEIPT } from "@/lib/data";
-import { formatShortDate, readHistory, type ETravelRecord } from "@/lib/etravel";
+import { formatShortDate } from "@/lib/etravel";
+import {
+  claimFor,
+  listMyOrders,
+  statusLabel,
+  verifyPath,
+  type ETravelOrder,
+} from "@/lib/etravel-orders";
 import { shortNameOf, useUser } from "@/lib/user";
 
 /**
@@ -14,10 +21,10 @@ import { shortNameOf, useUser } from "@/lib/user";
  */
 export function LogsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const user = useUser();
-  const [records, setRecords] = useState<ETravelRecord[]>([]);
+  const [records, setRecords] = useState<ETravelOrder[]>([]);
 
   useEffect(() => {
-    if (open) setRecords(readHistory());
+    if (open) void listMyOrders().then(setRecords);
   }, [open]);
 
   return (
@@ -77,7 +84,7 @@ export function LogsModal({ open, onClose }: { open: boolean; onClose: () => voi
                 <ul className="mt-2 space-y-2">
                   {records.map((record) => (
                     <li
-                      key={record.reference}
+                      key={record.ref}
                       className="flex items-center gap-3 rounded-xl border border-lp-line bg-white p-3 dark:border-lp-dark-line dark:bg-white/[0.03]"
                     >
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-lp-primary/10 text-lp-primary">
@@ -85,15 +92,15 @@ export function LogsModal({ open, onClose }: { open: boolean; onClose: () => voi
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-mono text-[12.5px] font-bold text-lp-ink dark:text-lp-dark-text">
-                          {record.reference}
+                          {record.ref}
                         </p>
                         <p className="truncate text-[11.5px] text-lp-body/70 dark:text-lp-dark-muted/80">
-                          {record.route} • {record.flight ?? "no flight"} •{" "}
-                          {formatShortDate(record.departureISO)}
+                          {record.destination} • {record.flight_no ?? "no flight"} •{" "}
+                          {formatShortDate(record.departure_date)} • {statusLabel(record.status)}
                         </p>
                       </div>
                       <Link
-                        href={`/verify/${record.reference}`}
+                        href={verifyPath(record, claimFor(record.ref)?.accessKey)}
                         className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-lp-line px-2.5 py-1.5 text-[11.5px] font-semibold text-lp-body transition hover:border-lp-primary/50 hover:text-lp-primary dark:border-lp-dark-line dark:text-lp-dark-muted"
                       >
                         <ExternalLink className="h-3 w-3" />
@@ -125,7 +132,8 @@ export function LogsModal({ open, onClose }: { open: boolean; onClose: () => voi
 
             <p className="mt-5 flex items-start gap-1.5 text-[11px] leading-snug text-lp-body/55 dark:text-lp-dark-muted/70">
               <ReceiptText className="mt-px h-3 w-3 shrink-0" />
-              Demo records generated on this device. Nothing here was filed with a real agency.
+              A declaration is only filed once an operator records the agency&apos;s own reference
+              against it — anything still pending has not reached the Bureau of Immigration.
             </p>
           </motion.div>
         </motion.div>

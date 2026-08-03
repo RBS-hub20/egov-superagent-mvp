@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, ExternalLink, Loader2, Upload, X } from "lucide-react";
 import { ActionButton, Field } from "./ui";
-import { formatTravelDate, updateFiling, type ETravelRecord } from "@/lib/etravel";
+import { formatTravelDate } from "@/lib/etravel";
+import { adminMarkFiled, type ETravelOrder } from "@/lib/etravel-orders";
 
 const ETRAVEL_URL = "https://etravel.gov.ph";
 
@@ -38,8 +39,42 @@ function CopyRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function FilePicker({
+  label,
+  accept,
+  file,
+  onPick,
+}: {
+  label: string;
+  accept: string;
+  file: File | null;
+  onPick: (f: File | null) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+        {label}
+      </span>
+      <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-dashed border-white/[0.12] px-3 py-2.5">
+        <Upload className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+        <input
+          type="file"
+          accept={accept}
+          onChange={(e) => onPick(e.target.files?.[0] ?? null)}
+          className="min-w-0 flex-1 text-[12px] text-zinc-400 file:mr-2 file:rounded-md file:border-0 file:bg-white/[0.06] file:px-2 file:py-1 file:text-[11px] file:text-zinc-300"
+        />
+      </div>
+      {file ? (
+        <span className="mt-1 block truncate text-[11px] text-zinc-500">
+          {file.name} • {(file.size / 1024).toFixed(0)} KB
+        </span>
+      ) : null}
+    </label>
+  );
+}
+
 /**
- * The step that turns a demo record into a real one.
+ * The step that turns a pending declaration into a filed one.
  *
  * SuperAgent cannot file on etravel.gov.ph unattended, so an operator does it
  * on the agency's own site and records what came back. Everything captured here
@@ -47,53 +82,58 @@ function CopyRow({ label, value }: { label: string; value: string }) {
  * the Bureau of Immigration itself.
  */
 export function FileNowModal({
-  record,
+  order,
   onClose,
   onFiled,
 }: {
-  record: ETravelRecord | null;
+  order: ETravelOrder | null;
   onClose: () => void;
   onFiled: () => void;
 }) {
-  const [govReference, setGovReference] = useState("");
+  const [officialRef, setOfficialRef] = useState("");
   const [notes, setNotes] = useState("");
-  const [qrName, setQrName] = useState("");
-  const [pdfName, setPdfName] = useState("");
+  const [qr, setQr] = useState<File | null>(null);
+  const [pdf, setPdf] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Re-opening on a different traveller must not inherit the last one's fields.
+  useEffect(() => {
+    setOfficialRef(order?.official_ref ?? "");
+    setNotes(order?.notes ?? "");
+    setQr(null);
+    setPdf(null);
+    setError(null);
+  }, [order]);
+
   async function markFiled() {
-    const reference = govReference.trim();
+    if (!order) return;
+    const reference = officialRef.trim();
     if (!reference) {
       setError("Ilagay ang official reference galing sa eTravel bago i-mark as filed.");
       return;
     }
     setBusy(true);
     setError(null);
-    updateFiling(record!.reference, { status: "filing" });
-    // Brief pause so the queue visibly moves through FILING.
-    await new Promise((r) => setTimeout(r, 900));
-    updateFiling(record!.reference, {
-      status: "filed",
-      govReference: reference,
-      filedAt: new Date().toISOString(),
-      filedBy: "Owner console",
-      qrFileName: qrName || undefined,
-      pdfFileName: pdfName || undefined,
+    const updated = await adminMarkFiled({
+      id: order.id,
+      ref: order.ref,
+      official_ref: reference,
       notes: notes.trim() || undefined,
-      notified: false,
+      qr,
+      pdf,
     });
     setBusy(false);
-    setGovReference("");
-    setNotes("");
-    setQrName("");
-    setPdfName("");
+    if (!updated) {
+      setError("Hindi na-save. Tingnan ang connection at subukan ulit.");
+      return;
+    }
     onFiled();
   }
 
   return (
     <AnimatePresence>
-      {record ? (
+      {order ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -103,7 +143,11 @@ export function FileNowModal({
           aria-modal="true"
           aria-labelledby="file-now-title"
         >
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={busy ? undefined : onClose} aria-hidden />
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={busy ? undefined : onClose}
+            aria-hidden
+          />
 
           <motion.div
             initial={{ y: 40, opacity: 0, scale: 0.98 }}
@@ -125,7 +169,7 @@ export function FileNowModal({
             <h2 id="file-now-title" className="text-[18px] font-bold tracking-tight text-white">
               File to Bureau of Immigration
             </h2>
-            <p className="mt-1.5 font-mono text-[12.5px] text-zinc-500">{record.reference}</p>
+            <p className="mt-1.5 font-mono text-[12.5px] text-zinc-500">{order.ref}</p>
 
             {/* Step 1 */}
             <section className="mt-5 rounded-xl border border-white/[0.07] bg-[#0A0A0B] p-4">
@@ -149,20 +193,13 @@ export function FileNowModal({
                 Step 2 — copy the traveller details
               </p>
               <div className="mt-2">
-                <CopyRow label="Full name" value={record.travelerName} />
-                <CopyRow label="Nationality" value={record.nationality} />
-                <CopyRow label="Flight" value={record.flight ?? "Not specified"} />
-                <CopyRow label="Departure" value={formatTravelDate(record.departureISO)} />
-                <CopyRow label="Destination" value={record.destination} />
-                <CopyRow label="Departure port" value={record.port} />
-                {record.returnISO ? (
-                  <CopyRow label="Return" value={formatTravelDate(record.returnISO)} />
-                ) : null}
+                <CopyRow label="Full name" value={order.traveler_name} />
+                <CopyRow label="Passport number" value={order.passport_no ?? "Not provided"} />
+                <CopyRow label="Flight" value={order.flight_no ?? "Not specified"} />
+                <CopyRow label="Departure" value={formatTravelDate(order.departure_date)} />
+                <CopyRow label="Departure port" value={order.departure_airport} />
+                <CopyRow label="Destination" value={order.destination} />
               </div>
-              <p className="mt-2 text-[11.5px] leading-snug text-zinc-500">
-                Passport number is not stored by this app — read it from the traveller&apos;s vault
-                document or ask them directly.
-              </p>
             </section>
 
             {/* Step 3 */}
@@ -173,45 +210,24 @@ export function FileNowModal({
               <div className="mt-3 space-y-3">
                 <Field
                   label="Official eTravel reference"
-                  value={govReference}
-                  onChange={setGovReference}
+                  value={officialRef}
+                  onChange={setOfficialRef}
                   placeholder="ETR-GOV-XXXXXX"
                 />
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
-                      QR screenshot
-                    </span>
-                    <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-dashed border-white/[0.12] px-3 py-2.5">
-                      <Upload className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setQrName(e.target.files?.[0]?.name ?? "")}
-                        className="min-w-0 flex-1 text-[12px] text-zinc-400 file:mr-2 file:rounded-md file:border-0 file:bg-white/[0.06] file:px-2 file:py-1 file:text-[11px] file:text-zinc-300"
-                      />
-                    </div>
-                  </label>
-                  <label className="block">
-                    <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
-                      Gov PDF
-                    </span>
-                    <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-dashed border-white/[0.12] px-3 py-2.5">
-                      <Upload className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        onChange={(e) => setPdfName(e.target.files?.[0]?.name ?? "")}
-                        className="min-w-0 flex-1 text-[12px] text-zinc-400 file:mr-2 file:rounded-md file:border-0 file:bg-white/[0.06] file:px-2 file:py-1 file:text-[11px] file:text-zinc-300"
-                      />
-                    </div>
-                  </label>
+                  <FilePicker label="QR screenshot" accept="image/*" file={qr} onPick={setQr} />
+                  <FilePicker
+                    label="Gov PDF"
+                    accept="application/pdf"
+                    file={pdf}
+                    onPick={setPdf}
+                  />
                 </div>
                 <Field label="Notes" value={notes} onChange={setNotes} placeholder="Optional" />
               </div>
               <p className="mt-2.5 text-[11.5px] leading-snug text-zinc-500">
-                Filenames are recorded for the audit trail; the files themselves are not uploaded
-                anywhere in this build.
+                Uploads go to a private bucket; the traveller sees them through short-lived signed
+                links, never a public URL.
               </p>
             </section>
 

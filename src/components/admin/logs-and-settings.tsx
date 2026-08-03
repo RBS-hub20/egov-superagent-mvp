@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { KeyRound, Search, ShieldAlert, UserPlus } from "lucide-react";
 import { ActionButton, Badge, EmptyState, Field, Panel } from "./ui";
-import { readHistory, type ETravelRecord } from "@/lib/etravel";
+import { adminListOrders, statusLabel, type ETravelOrder } from "@/lib/etravel-orders";
 import { listOrders, timeAgo, type Order } from "@/lib/orders";
 
 interface Entry {
@@ -14,31 +14,26 @@ interface Entry {
 }
 
 /** One timeline across declarations and orders — the anti-fixer audit trail. */
-function buildEntries(records: ETravelRecord[], orders: Order[]): Entry[] {
+function buildEntries(records: ETravelOrder[], orders: Order[]): Entry[] {
   const entries: Entry[] = [];
 
   records.forEach((r) => {
     entries.push({
-      at: r.registeredAt,
-      ref: r.reference,
-      event: `Declaration drafted for ${r.destination} • ${r.flight ?? "no flight"}`,
-      tone: "neutral",
+      at: r.created_at,
+      ref: r.ref,
+      event: `Declaration queued for ${r.destination} • ${r.flight_no ?? "no flight"}`,
+      tone: "demo",
     });
-    if (r.filing?.status === "filed" && r.filing.filedAt) {
+    if (r.status === "FILED" && r.filed_at) {
       entries.push({
-        at: r.filing.filedAt,
-        ref: r.reference,
-        event: `Filed on etravel.gov.ph by ${r.filing.filedBy ?? "operator"} — official ${r.filing.govReference}`,
+        at: r.filed_at,
+        ref: r.ref,
+        // The line an audit asks for: who says they filed it, where, and when.
+        event: `Operator attests filed on etravel.gov.ph at ${manilaClock(r.filed_at)} by ${r.filed_by ?? "operator"} — official ${r.official_ref}`,
         tone: "filed",
       });
-      if (r.filing.notified) {
-        entries.push({
-          at: r.filing.filedAt,
-          ref: r.reference,
-          event: "Traveller notified in chat",
-          tone: "neutral",
-        });
-      }
+    } else if (r.status === "FILING") {
+      entries.push({ at: r.created_at, ref: r.ref, event: statusLabel(r.status), tone: "neutral" });
     }
   });
 
@@ -62,13 +57,24 @@ function buildEntries(records: ETravelRecord[], orders: Order[]): Entry[] {
   return entries.sort((a, b) => b.at.localeCompare(a.at));
 }
 
+const CLOCK = new Intl.DateTimeFormat("en-PH", {
+  timeZone: "Asia/Manila",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+function manilaClock(iso: string): string {
+  return CLOCK.format(new Date(iso));
+}
+
 export function AdminLogs() {
-  const [records, setRecords] = useState<ETravelRecord[]>([]);
+  const [records, setRecords] = useState<ETravelOrder[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    setRecords(readHistory());
+    void adminListOrders().then((result) => setRecords(result.orders));
     setOrders(listOrders());
   }, []);
 

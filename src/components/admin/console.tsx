@@ -20,7 +20,7 @@ import { AdminLogs, AdminSettings } from "./logs-and-settings";
 import { Panel } from "./ui";
 import { LICENSEE } from "@/lib/brand";
 import { AGENCIES } from "@/lib/data";
-import { filingStatus, readHistory } from "@/lib/etravel";
+import { adminListOrders, subscribeOrders, type Backend } from "@/lib/etravel-orders";
 import { listOrders, peso, totals, type Totals } from "@/lib/orders";
 
 type TabKey = "all" | "etravel" | "bayad" | "psa" | "logs" | "settings";
@@ -87,18 +87,19 @@ export function OwnerConsole() {
   const router = useRouter();
   const [tab, setTab] = useState<TabKey>("etravel");
   const [stats, setStats] = useState<Stats | null>(null);
+  const [backend, setBackend] = useState<Backend>("local");
 
-  const recompute = useCallback(() => {
+  const recompute = useCallback(async () => {
     const orders = listOrders();
-    const pending = readHistory().filter((r) => filingStatus(r) !== "filed").length;
+    const { orders: declarations, backend: mode } = await adminListOrders();
+    const pending = declarations.filter((d) => d.status !== "FILED").length;
     setStats({ ...totals(orders), etravelPending: pending });
+    setBackend(mode);
   }, []);
 
   useEffect(() => {
-    recompute();
-    // Cheap stand-in for a live feed until there is a backend to subscribe to.
-    const id = setInterval(recompute, 5000);
-    return () => clearInterval(id);
+    void recompute();
+    return subscribeOrders(() => void recompute());
   }, [recompute]);
 
   async function logout() {
@@ -214,8 +215,9 @@ export function OwnerConsole() {
 
         <p className="mt-10 flex flex-wrap items-center gap-2 border-t border-white/[0.07] pt-5 text-[11.5px] leading-relaxed text-zinc-600">
           <ScrollText className="h-3.5 w-3.5 shrink-0" />
-          Records are stored in this browser only — an operator sees orders raised on this device.
-          A shared backend is the next step.
+          {backend === "supabase"
+            ? "eTravel declarations live in Supabase and reach this console the moment a traveller submits one. Bayad Center and PSA rows are still device-local demo data."
+            : "No Supabase project is configured, so this console only sees declarations filed in this browser. Set the project variables to make it a shared queue."}
           <span className="ml-auto inline-flex items-center gap-1.5 uppercase tracking-[0.14em]">
             <SettingsIcon className="h-3 w-3" />
             Built by {LICENSEE.short}
