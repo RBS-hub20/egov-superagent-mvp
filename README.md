@@ -24,7 +24,7 @@ device, and hands you a receipt for every step so no fixer is ever needed.
 | `/` | Landing — hero, Why SuperAgent, services bento, Anti-Fixer Receipt (light/dark). **Launch SuperAgent** goes to `/intro` |
 | `/intro` | Three auto-advancing slides with dots and Skip → Sign Up Free, Login, or straight to the console. Always white |
 | `/app/signup`, `/app/login` | Phone or email, one-time code |
-| `/pitch` | Pitch deck — 12 scroll-snapped sections, presenter keys, dark navy. Public by link, `noindex` |
+| `/pitch` | Public product page — what the service does, how a request is handled, and what proof comes back |
 | `/product`, `/onboarding` | Legacy paths — redirect to `/` and `/intro` |
 | `/app` | The console — same theme as the landing: sidebar, chat with generative UI, vault + receipt + memory rail |
 | `/admin` | Owner console — eTravel queue, Bayad Center, PSA deliveries, logs, settings. Password-gated |
@@ -81,7 +81,7 @@ src/components/
   ├─ cards/                   ETravelCard + the review → registered flow
   ├─ verify/                  record check screen
   ├─ intro/                   the three slides and their illustrations
-  ├─ pitch/                   pitch deck: shell with the section rail, the 12 slides, primitives
+  ├─ pitch/                   public product page: sticky header, the nine sections, primitives
   ├─ brand/                   AppIcon + BrandLockup — the icon, and the icon with the name beside it
   ├─ landing/                 nav, hero, why, services bento, trust receipt, footer, background FX
   ├─ theme/                   ThemeProvider + pill toggle (localStorage 'egov-theme')

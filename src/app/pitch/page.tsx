@@ -1,19 +1,57 @@
 import type { Metadata } from "next";
-import { PitchDeck } from "@/components/pitch/pitch-deck";
+import { PitchHeader } from "@/components/pitch/header";
+import {
+  Agencies,
+  Comparison,
+  Hero,
+  HowItWorks,
+  PitchFooter,
+  Problem,
+  SmsAccess,
+  Solution,
+  Status,
+  Vision,
+} from "@/components/pitch/sections";
 
 export const metadata: Metadata = {
-  title: "Pitch — One Chat. All Government.",
+  title: "One chat. Lahat ng government services.",
   description:
-    "eGov SuperAgent: the AI concierge for Philippine e-government. Problem, solution, SMS offline mode, the live Immigration pipeline, market and the ask.",
+    "eGov SuperAgent is an AI concierge for Philippine government services. From eTravel to PSA to SSS — isang chat lang, with official references, receipts and a public verification page.",
   alternates: { canonical: "/pitch" },
-  // Public by link, out of search. The deck carries pricing, projections and an
-  // ask — things to hand to someone deliberately, not to rank for.
-  robots: { index: false, follow: false },
+  openGraph: {
+    title: "eGov SuperAgent — One chat. Lahat ng government services.",
+    description:
+      "From eTravel to PSA to SSS — isang chat lang. Taglish? Okay. Official references, receipts, and a verification page for every request.",
+    url: "/pitch",
+  },
 };
 
 /**
- * The pitch deck. Public, no auth, no gate — anyone with the link can read it.
+ * The public product page.
+ *
+ * Everything on it is written for citizens, OFWs and partners: what the service
+ * does, how a request is handled, and what proof comes back. It deliberately
+ * carries no commercial or operational internals.
+ *
+ * Only the header is a client component; every section below is static, so the
+ * page ships almost no JavaScript.
  */
 export default function PitchPage() {
-  return <PitchDeck />;
+  return (
+    <div className="min-h-[100dvh] bg-[#0A1931] text-white antialiased">
+      <PitchHeader />
+      <main>
+        <Hero />
+        <Problem />
+        <Solution />
+        <SmsAccess />
+        <Agencies />
+        <HowItWorks />
+        <Comparison />
+        <Status />
+        <Vision />
+      </main>
+      <PitchFooter />
+    </div>
+  );
 }

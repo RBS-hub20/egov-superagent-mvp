@@ -14,7 +14,7 @@ import { ADMIN_COOKIE, isValidAdminCookie } from "@/lib/admin-auth";
 const PUBLIC_PATHS = new Set([
   "/", // marketing landing
   "/intro", // three-slide intro
-  "/pitch", // pitch deck — public by link, never gated
+  "/pitch", // public product page
   "/product", // legacy path, redirects to /
   "/onboarding", // legacy path, redirects to /intro
   "/app", // SuperAgent console
@@ -62,11 +62,7 @@ export async function middleware(req: NextRequest) {
   // The vault is a local-only promise; make it enforceable rather than a claim.
   // No connect-src to third parties means encrypted documents cannot be shipped
   // anywhere even if a dependency tried.
-  // Public and indexable are not the same thing: the pitch deck is open to
-  // anyone with the link, but it carries pricing and an ask, so it stays out of
-  // search. Drop it from NO_INDEX to have it rank.
-  const NO_INDEX = pathname.startsWith("/admin") || pathname === "/pitch";
-  if (NO_INDEX) {
+  if (pathname.startsWith("/admin")) {
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
   } else if (isPublicPath(pathname)) {
     res.headers.set("X-Robots-Tag", "index, follow");

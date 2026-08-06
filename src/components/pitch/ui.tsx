@@ -2,33 +2,33 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Pitch deck primitives.
+ * Building blocks for the public /pitch page.
  *
- * The deck is always dark — it is presented, not themed — so these carry
- * explicit colours instead of the `lp-*` light/dark pairs the rest of the app
- * uses. Navy #0A1931 is the brand tile's own background; gold #FFC300 marks the
- * one thing on each slide that should be read first.
+ * The page is presented on one fixed surface — navy #0A1931 with a gold accent
+ * — rather than following the app's light/dark theme, so these carry explicit
+ * colours instead of the `lp-*` pairs used elsewhere. Everything here is a
+ * server component: the page ships no JavaScript except the sticky header.
  */
 
-export const GOLD = "#FFC300";
-export const NAVY = "#0A1931";
-
-export function Slide({
+export function Section({
   id,
   children,
   className,
+  bleed = false,
 }: {
-  id: string;
+  id?: string;
   children: ReactNode;
   className?: string;
+  /** Slightly lifted background, to separate a section from its neighbours. */
+  bleed?: boolean;
 }) {
   return (
     <section
       id={id}
-      // Min-height rather than fixed: a slide that outgrows a short laptop
-      // screen should scroll, not clip.
+      // scroll-mt clears the sticky header when an anchor link lands here.
       className={cn(
-        "relative flex min-h-[100dvh] w-full snap-start flex-col justify-center px-6 py-24 sm:px-10 lg:px-16",
+        "scroll-mt-20 px-5 py-20 sm:px-8 sm:py-24 lg:py-28",
+        bleed && "bg-white/[0.02]",
         className
       )}
     >
@@ -39,18 +39,23 @@ export function Slide({
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#FFC300]">{children}</p>
+    <p className="text-[11.5px] font-semibold uppercase tracking-[0.2em] text-[#FFC300]">
+      {children}
+    </p>
   );
 }
 
-export function Title({ children, className }: { children: ReactNode; className?: string }) {
+export function SectionTitle({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <h2
-      className={cn(
-        "mt-4 text-balance font-bold leading-[1.05] tracking-tighter text-white",
-        className
-      )}
-      style={{ fontSize: "clamp(32px, 5vw, 58px)" }}
+      className={cn("mt-4 text-balance font-bold tracking-tight text-white", className)}
+      style={{ fontSize: "clamp(30px, 4vw, 46px)", lineHeight: 1.1 }}
     >
       {children}
     </h2>
@@ -59,29 +64,34 @@ export function Title({ children, className }: { children: ReactNode; className?
 
 export function Lede({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <p className={cn("mt-5 max-w-3xl text-pretty text-[17px] leading-relaxed text-[#9DB0CE]", className)}>
+    <p
+      className={cn(
+        "mt-5 max-w-2xl text-pretty text-[16.5px] leading-relaxed text-[#A8B8D4]",
+        className
+      )}
+    >
       {children}
     </p>
   );
 }
 
+/** Glass card: a light wash over navy, never a hard panel. */
 export function Card({
   children,
   className,
-  tone = "default",
+  accent = false,
 }: {
   children: ReactNode;
   className?: string;
-  tone?: "default" | "gold" | "danger" | "good";
+  accent?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "rounded-2xl border p-5 backdrop-blur-sm transition",
-        tone === "default" && "border-white/[0.09] bg-white/[0.035] hover:border-white/20",
-        tone === "gold" && "border-[#FFC300]/35 bg-[#FFC300]/[0.07]",
-        tone === "danger" && "border-rose-400/25 bg-rose-500/[0.06]",
-        tone === "good" && "border-emerald-400/25 bg-emerald-500/[0.06]",
+        "rounded-2xl border p-6 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_20px_40px_-24px_rgba(0,0,0,0.7)] backdrop-blur-[2px] transition-colors",
+        accent
+          ? "border-[#FFC300]/30 bg-[#FFC300]/[0.05]"
+          : "border-white/[0.08] bg-white/[0.035] hover:border-white/[0.16]",
         className
       )}
     >
@@ -90,21 +100,20 @@ export function Card({
   );
 }
 
-export function Pill({
+export function Badge({
   children,
-  tone = "default",
+  tone = "neutral",
 }: {
   children: ReactNode;
-  tone?: "default" | "gold" | "good" | "danger";
+  tone?: "neutral" | "gold" | "live";
 }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] ring-1 ring-inset",
-        tone === "default" && "bg-white/[0.06] text-[#C7D4EA] ring-white/15",
-        tone === "gold" && "bg-[#FFC300]/15 text-[#FFC300] ring-[#FFC300]/35",
-        tone === "good" && "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30",
-        tone === "danger" && "bg-rose-500/15 text-rose-300 ring-rose-400/30"
+        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] ring-1 ring-inset",
+        tone === "neutral" && "bg-white/[0.06] text-[#A8B8D4] ring-white/15",
+        tone === "gold" && "bg-[#FFC300]/12 text-[#FFC300] ring-[#FFC300]/30",
+        tone === "live" && "bg-emerald-400/12 text-emerald-300 ring-emerald-400/30"
       )}
     >
       {children}
@@ -112,41 +121,59 @@ export function Pill({
   );
 }
 
-export function Stat({
-  value,
-  label,
-  tone = "default",
-}: {
-  value: string;
-  label: string;
-  tone?: "default" | "gold";
-}) {
+export function CardTitle({ children }: { children: ReactNode }) {
+  return <h3 className="text-[18px] font-semibold tracking-tight text-white">{children}</h3>;
+}
+
+export function CardBody({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div>
-      <p
-        className={cn(
-          "font-bold leading-none tracking-tighter",
-          tone === "gold" ? "text-[#FFC300]" : "text-white"
-        )}
-        style={{ fontSize: "clamp(30px, 3.6vw, 46px)" }}
-      >
-        {value}
-      </p>
-      <p className="mt-2 text-[13px] leading-snug text-[#9DB0CE]">{label}</p>
-    </div>
+    <p className={cn("mt-2.5 text-[14.5px] leading-relaxed text-[#A8B8D4]", className)}>
+      {children}
+    </p>
   );
 }
 
-/** Numbered step marker used by the how-it-works and go-to-market slides. */
-export function StepNumber({ n, tone = "blue" }: { n: number; tone?: "blue" | "gold" }) {
+/** The one repeated call to action, so every instance matches. */
+export function GoldButton({
+  href,
+  children,
+  className,
+}: {
+  href: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <span
+    <a
+      href={href}
       className={cn(
-        "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[13px] font-bold",
-        tone === "blue" ? "bg-[#0F46F3]/20 text-[#7EA6FF]" : "bg-[#FFC300]/15 text-[#FFC300]"
+        "inline-flex items-center justify-center gap-2 rounded-xl bg-[#FFC300] px-6 py-3.5 text-[15px] font-semibold text-[#0A1931] transition hover:bg-[#FFD23F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC300] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A1931]",
+        className
       )}
     >
-      {n}
-    </span>
+      {children}
+    </a>
+  );
+}
+
+export function GhostButton({
+  href,
+  children,
+  className,
+}: {
+  href: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <a
+      href={href}
+      className={cn(
+        "inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-6 py-3.5 text-[15px] font-semibold text-white transition hover:border-white/30 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
+        className
+      )}
+    >
+      {children}
+    </a>
   );
 }
