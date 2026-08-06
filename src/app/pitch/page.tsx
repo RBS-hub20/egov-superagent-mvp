@@ -14,14 +14,14 @@ import {
 } from "@/components/pitch/sections";
 
 export const metadata: Metadata = {
-  title: "One chat. Lahat ng government services.",
+  title: "One chat. Every government service.",
   description:
-    "eGov SuperAgent is an AI concierge for Philippine government services. From eTravel to PSA to SSS — isang chat lang, with official references, receipts and a public verification page.",
+    "eGov SuperAgent is an AI concierge for Philippine government services. From eTravel to PSA to SSS — one conversation, with official references, receipts and a public verification page.",
   alternates: { canonical: "/pitch" },
   openGraph: {
-    title: "eGov SuperAgent — One chat. Lahat ng government services.",
+    title: "eGov SuperAgent — One chat. Every government service.",
     description:
-      "From eTravel to PSA to SSS — isang chat lang. Taglish? Okay. Official references, receipts, and a verification page for every request.",
+      "From eTravel to PSA to SSS — one conversation. No queues. No fixers. Official references, receipts, and a verification page for every request.",
     url: "/pitch",
   },
 };

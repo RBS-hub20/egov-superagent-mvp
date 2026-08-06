@@ -62,11 +62,11 @@ function HeroPreview() {
 
         <div className="space-y-3 py-5">
           <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-[#0F46F3] px-4 py-2.5 text-[14px] text-white">
-            File mo eTravel ko, lipad ako bukas 3pm.
+            File my eTravel — I fly tomorrow at 3pm.
           </p>
           <p className="w-fit max-w-[92%] rounded-2xl rounded-tl-sm border border-white/10 bg-white/[0.06] px-4 py-2.5 text-[14px] leading-relaxed text-[#E4EBF7]">
-            Nakuha ko na ang detalye. Ipapasok ko sa filing queue at ipapadala ko ang reference mo
-            paglabas ng resulta.
+            Got the details. I&apos;ve placed it in the filing queue and will send your reference as
+            soon as it comes back.
           </p>
         </div>
 
@@ -125,13 +125,13 @@ export function Hero() {
           >
             One chat.{" "}
             <span className="bg-gradient-to-r from-[#FFC300] to-[#FFDF7A] bg-clip-text text-transparent">
-              Lahat ng government services.
+              Every government service.
             </span>
           </h1>
 
           <p className="mt-6 max-w-xl text-pretty text-[18px] leading-relaxed text-[#A8B8D4]">
-            From eTravel to PSA to SSS — isang chat lang. Taglish? Okay. Kami na ang bahala sa
-            forms, filing, tracking, at official receipts.
+            From eTravel to PSA to SSS — one conversation. No queues. No fixers. Official receipts,
+            tracked and verifiable. Built for 115 million Filipinos at home and 10 million overseas.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -139,7 +139,7 @@ export function Hero() {
               Launch SuperAgent
               <ArrowRight className="h-4 w-4" />
             </GoldButton>
-            <GhostButton href="#how">Paano gumagana?</GhostButton>
+            <GhostButton href="#how">See how it works</GhostButton>
           </div>
 
           <ul className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -164,17 +164,17 @@ const PROBLEMS = [
   {
     icon: Fingerprint,
     title: "7 apps. 7 passwords.",
-    body: "Bawat ahensya, sariling portal at sariling account. eGovPH, My.SSS, PhilHealth, Pag-IBIG, PSA, eTravel — magkakahiwalay lahat, at ikaw ang nag-uugnay sa kanila.",
+    body: "Every agency ships its own portal and its own account. eGovPH, My.SSS, PhilHealth, Pag-IBIG, PSA, eTravel — all separate, and the citizen is the one holding them together.",
   },
   {
     icon: ClipboardList,
-    title: "Pila at fixer.",
-    body: "Maghapong pila, o magbayad sa taong walang resibo. Walang tracking, walang katibayan, at walang mahahabol kapag hindi natuloy ang transaksyon.",
+    title: "Queues and fixers.",
+    body: "A full day in line, or a payment to someone who issues no receipt. No tracking, no proof, and nothing to point to when a transaction quietly fails.",
   },
   {
     icon: Signal,
-    title: "Mahina ang signal.",
-    body: "Sa probinsya, sa barko, at sa ibang bansa, hindi laging kayang mag-load ng portal. Ang serbisyong hindi maabot ay hindi serbisyo.",
+    title: "Weak signal? We include everyone.",
+    body: "In the provinces, at sea, and abroad, a heavy portal often will not load at all. A service that cannot be reached is not a service.",
   },
 ];
 
@@ -182,10 +182,10 @@ export function Problem() {
   return (
     <Section bleed>
       <Eyebrow>The problem</Eyebrow>
-      <SectionTitle>Hindi na dapat mahirap.</SectionTitle>
+      <SectionTitle>Government services shouldn&apos;t be hard.</SectionTitle>
       <Lede>
-        Ang bawat ahensya ay may sariling sistema. Ang hindi pa naaayos ay ang buong karanasan ng
-        mamamayan mula simula hanggang sa katibayan.
+        Each agency has solved its own system. What is still unsolved is the citizen&apos;s
+        experience end to end — from the first request to the proof that it was done.
       </Lede>
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -211,10 +211,10 @@ export function Solution() {
   return (
     <Section>
       <Eyebrow>The solution</Eyebrow>
-      <SectionTitle>Utusan mo lang. Kami na ang bahala.</SectionTitle>
+      <SectionTitle>Just tell us. We handle the rest.</SectionTitle>
       <Lede>
-        Sabihin mo ang kailangan mo sa sarili mong salita. Kami ang bahala sa form, sa pila, at sa
-        katibayan na natapos ito.
+        Say what you need in your own words. We take care of the form, the queue, and the proof that
+        it was completed.
       </Lede>
 
       <ol className="mt-12 grid gap-5 lg:grid-cols-3">
@@ -226,9 +226,15 @@ export function Solution() {
             <CardTitle>
               <span className="mt-3 block">Chat naturally.</span>
             </CardTitle>
-            <CardBody>English, Filipino, o Taglish — pareho lang ang maiintindihan.</CardBody>
+            <CardBody>
+              Plain language, no forms to decode. English or Filipino — both are understood.
+            </CardBody>
             <div className="mt-4 space-y-2">
-              {["Bayaran SSS ko.", "File eTravel ko.", "Kunin PSA birth certificate."].map((q) => (
+              {[
+                "Pay my SSS contribution.",
+                "File my eTravel declaration.",
+                "Get my PSA birth certificate.",
+              ].map((q) => (
                 <p
                   key={q}
                   className="rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-2 text-[13.5px] text-[#E4EBF7]"
@@ -246,11 +252,11 @@ export function Solution() {
               Step 02
             </p>
             <CardTitle>
-              <span className="mt-3 block">Coordinated at tracked.</span>
+              <span className="mt-3 block">Secure coordination.</span>
             </CardTitle>
             <CardBody>
-              Inaayos ng SuperAgent ang hinihingi mong impormasyon, at isang beripikadong operator
-              ang nagsasagawa nito sa opisyal na portal ng ahensya. Nakatala ang bawat hakbang.
+              SuperAgent organises what the agency asks for, and a verified operator completes the
+              request through the agency&apos;s official workflow. Every step is recorded.
             </CardBody>
             <ul className="mt-4 space-y-2">
               {[
@@ -273,10 +279,11 @@ export function Solution() {
               Step 03
             </p>
             <CardTitle>
-              <span className="mt-3 block">May katibayan ka.</span>
+              <span className="mt-3 block">Receive your proof.</span>
             </CardTitle>
             <CardBody>
-              Pagkatapos, matatanggap mo ang opisyal na reference at ang mga dokumentong kasama nito.
+              You get the official reference the agency issued, together with the documents that
+              belong to it.
             </CardBody>
             <ul className="mt-4 space-y-2">
               {[
@@ -328,14 +335,14 @@ function SmsPhone() {
           </div>
           <div className="w-[92%] rounded-2xl rounded-tl-sm border border-white/10 bg-white/[0.06] px-3.5 py-2.5">
             <p className="text-[12.5px] leading-relaxed text-[#E4EBF7]">
-              Narito ang buod ng iyong SSS contributions at ang susunod na due date. Mag-reply para
-              sa detalye o sa susunod na hakbang.
+              Here is a summary of your SSS contributions and the next due date. Reply for details
+              or to continue with the next step.
             </p>
           </div>
         </div>
 
         <p className="border-t border-white/[0.07] pt-3 text-center text-[10.5px] uppercase tracking-[0.14em] text-[#5C7099]">
-          Walang app • Walang data
+          No app • No data plan
         </p>
       </div>
     </div>
@@ -348,10 +355,10 @@ export function SmsAccess() {
       <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <div>
           <Eyebrow>Accessibility</Eyebrow>
-          <SectionTitle>Kahit walang internet. TXT lang.</SectionTitle>
+          <SectionTitle>Works even without internet. Just TXT.</SectionTitle>
           <Lede>
-            Hindi lahat ay may data o bagong telepono. Ang parehong serbisyo ay maaabot sa simpleng
-            text message, kaya walang naiiwan.
+            Not everyone has mobile data or a recent phone. The same service is reachable by plain
+            text message, so nobody is left out.
           </Lede>
 
           <div className="mt-8 inline-flex flex-wrap items-center gap-3 rounded-2xl border border-white/[0.1] bg-white/[0.04] px-5 py-4">
@@ -374,13 +381,14 @@ export function SmsAccess() {
 
           <div className="mt-8">
             <p className="text-[11.5px] font-semibold uppercase tracking-[0.16em] text-[#5C7099]">
-              Ginawa para sa
+              Built for
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              {["Senior citizens", "Probinsya", "OFWs", "Seafarers", "Keypad phones"].map((a) => (
+              {["Seniors", "Provinces", "Seafarers", "OFWs", "Keypad phones"].map((a) => (
                 <Badge key={a}>{a}</Badge>
               ))}
             </div>
+            <p className="mt-4 text-[13.5px] text-[#A8B8D4]">No app needed.</p>
           </div>
         </div>
 
@@ -393,10 +401,10 @@ export function SmsAccess() {
 /* -------------------------------------------------------- 5. agencies ---- */
 
 const SERVICES = [
-  { icon: Wallet, name: "SSS", detail: "Contributions at member records", live: false },
-  { icon: BadgeCheck, name: "PhilHealth", detail: "Membership at dependents", live: false },
-  { icon: Landmark, name: "Pag-IBIG", detail: "Savings at housing", live: false },
-  { icon: FileText, name: "PSA", detail: "Birth, marriage, at CENOMAR", live: false },
+  { icon: Wallet, name: "SSS", detail: "Contributions and member records", live: false },
+  { icon: BadgeCheck, name: "PhilHealth", detail: "Membership and dependents", live: false },
+  { icon: Landmark, name: "Pag-IBIG", detail: "Savings and housing", live: false },
+  { icon: FileText, name: "PSA", detail: "Birth, marriage and CENOMAR documents", live: false },
   { icon: Plane, name: "Immigration — eTravel", detail: "Travel declaration filing", live: true },
   { icon: Globe2, name: "DFA — Passport", detail: "Passport appointments", live: false },
 ];
@@ -405,10 +413,10 @@ export function Agencies() {
   return (
     <Section id="agencies">
       <Eyebrow>Government services</Eyebrow>
-      <SectionTitle>Anim na serbisyo, isang lugar.</SectionTitle>
+      <SectionTitle>Six services, one place.</SectionTitle>
       <Lede>
-        Ang eTravel ang unang serbisyong buo mula chat hanggang sa opisyal na reference. Ang iba ay
-        nasa guided preview habang tinatapos ang bawat proseso.
+        eTravel is the first service that runs complete, from chat to official reference. The rest
+        are in guided preview while each workflow is finished.
       </Lede>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -441,31 +449,47 @@ export function Agencies() {
 /* ------------------------------------------------------------ 6. how ----- */
 
 const PIPELINE = [
-  { icon: MessageSquare, title: "Citizen request", body: "Chat o SMS, sa sariling salita." },
-  { icon: Lock, title: "Secure vault", body: "Naka-encrypt sa device mo bago pa umalis." },
-  { icon: ClipboardList, title: "Queue", body: "Nakapila ang request na may sariling reference." },
-  { icon: UserCheck, title: "Verified operator", body: "Tao ang nagsasagawa, may pangalang nakatala." },
-  { icon: Landmark, title: "Agency portal", body: "Isinasagawa sa opisyal na website ng ahensya." },
-  { icon: BadgeCheck, title: "Reference", body: "Ibinabalik ang opisyal na numero ng ahensya." },
-  { icon: QrCode, title: "QR at PDF", body: "Nakakabit sa record ang mga dokumento." },
-  { icon: Globe2, title: "Verification", body: "Nakikita sa /verify ang katayuan nito." },
+  { icon: MessageSquare, title: "Citizen request", body: "By chat or SMS, in plain language." },
+  { icon: Lock, title: "Secure vault", body: "Documents are encrypted on your device first." },
+  { icon: ClipboardList, title: "Queue", body: "The request is queued under its own reference." },
+  { icon: UserCheck, title: "Verified operator", body: "A named person takes it on, on the record." },
+  { icon: Landmark, title: "Agency portal", body: "Completed on the agency's own official website." },
+  { icon: BadgeCheck, title: "Reference", body: "The agency's official number is recorded." },
+  { icon: QrCode, title: "QR and PDF", body: "The issued documents are attached to the record." },
+  { icon: Globe2, title: "Verification", body: "The record's status is public at /verify." },
 ];
 
 const SECURITY = [
-  { icon: Lock, label: "AES-GCM encryption", body: "Ang mga dokumento sa vault ay naka-encrypt sa iyong device." },
-  { icon: Globe2, label: "Signed links", body: "Ang mga file ay ibinibigay sa may-taning na link, hindi pampublikong URL." },
-  { icon: ScrollText, label: "Audit logs", body: "May tala ang bawat hakbang: sino, saan, at kailan." },
-  { icon: Fingerprint, label: "Privacy-first", body: "Ang hinihinging impormasyon ay yaong kailangan lamang ng form." },
+  {
+    icon: Lock,
+    label: "AES-GCM encryption",
+    body: "Documents in the vault are encrypted on your own device.",
+  },
+  {
+    icon: Globe2,
+    label: "Signed links",
+    body: "Files are served through expiring links, never a public URL.",
+  },
+  {
+    icon: ScrollText,
+    label: "Audit logs",
+    body: "Every step is recorded: who acted, where, and when.",
+  },
+  {
+    icon: Fingerprint,
+    label: "Privacy-first",
+    body: "We ask only for what the specific form actually requires.",
+  },
 ];
 
 export function HowItWorks() {
   return (
     <Section id="how" bleed>
       <Eyebrow>How it works</Eyebrow>
-      <SectionTitle>Mula sa chat hanggang sa katibayan.</SectionTitle>
+      <SectionTitle>From a chat to a verifiable record.</SectionTitle>
       <Lede>
-        Malinaw ang daloy at nakatala ang bawat hakbang. Walang awtomatikong pag-access sa anumang
-        sistema ng gobyerno — tao ang nagsasagawa sa opisyal na portal.
+        The path is deliberate and every step is logged. There is no automated access to any
+        government system — a verified operator completes the request on the official portal.
       </Lede>
 
       <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -487,10 +511,7 @@ export function HowItWorks() {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {SECURITY.map((s) => (
-          <div
-            key={s.label}
-            className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4"
-          >
+          <div key={s.label} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
             <p className="flex items-center gap-2 text-[13.5px] font-semibold text-white">
               <s.icon className="h-4 w-4 shrink-0 text-emerald-400" />
               {s.label}
@@ -511,39 +532,39 @@ const ROWS: { feature: string; portal: [Mark, string]; fixer: [Mark, string]; ou
   [
     {
       feature: "Ease of use",
-      portal: ["partial", "Forms at hiwalay na account"],
-      fixer: ["yes", "Madali, pero personal"],
-      ours: ["yes", "Isang chat, Taglish"],
+      portal: ["partial", "Forms and separate accounts"],
+      fixer: ["yes", "Easy, but entirely personal"],
+      ours: ["yes", "One conversation"],
     },
     {
       feature: "Tracking",
-      portal: ["partial", "Iba-iba kada ahensya"],
-      fixer: ["no", "Walang katiyakan"],
-      ours: ["yes", "Live status kada hakbang"],
+      portal: ["partial", "Differs by agency"],
+      fixer: ["no", "No visibility"],
+      ours: ["yes", "Live status at every step"],
     },
     {
       feature: "Official receipt",
-      portal: ["yes", "Kung matatapos mo"],
-      fixer: ["no", "Karaniwang wala"],
-      ours: ["yes", "Reference at dokumento"],
+      portal: ["yes", "If you finish the process"],
+      fixer: ["no", "Usually none"],
+      ours: ["yes", "Reference and documents"],
     },
     {
       feature: "Verification",
-      portal: ["partial", "Nasa portal lamang"],
-      fixer: ["no", "Walang mapagtatanungan"],
-      ours: ["yes", "Pampublikong verify page"],
+      portal: ["partial", "Inside the portal only"],
+      fixer: ["no", "Nothing to check against"],
+      ours: ["yes", "Public verification page"],
     },
     {
       feature: "Support",
-      portal: ["partial", "Limitado ang oras"],
-      fixer: ["partial", "Depende sa tao"],
-      ours: ["yes", "Tuloy-tuloy na chat"],
+      portal: ["partial", "Limited office hours"],
+      fixer: ["partial", "Depends on the person"],
+      ours: ["yes", "Continuous chat"],
     },
     {
       feature: "Transparency",
-      portal: ["partial", "Walang malinaw na tala"],
-      fixer: ["no", "Walang audit trail"],
-      ours: ["yes", "Nakatala ang bawat hakbang"],
+      portal: ["partial", "No consolidated record"],
+      fixer: ["no", "No audit trail"],
+      ours: ["yes", "Every step recorded"],
     },
   ];
 
@@ -557,7 +578,7 @@ export function Comparison() {
   return (
     <Section>
       <Eyebrow>Why eGov SuperAgent</Eyebrow>
-      <SectionTitle>Malinaw ang pinagkaiba.</SectionTitle>
+      <SectionTitle>A clear difference.</SectionTitle>
 
       <div className="mt-12 overflow-x-auto rounded-2xl border border-white/[0.08] eg-scroll">
         <table className="w-full min-w-[760px] border-collapse text-left">
@@ -580,10 +601,7 @@ export function Comparison() {
           <tbody>
             {ROWS.map((row) => (
               <tr key={row.feature} className="border-b border-white/[0.05] last:border-b-0">
-                <th
-                  scope="row"
-                  className="px-5 py-4 text-[14px] font-semibold text-white"
-                >
+                <th scope="row" className="px-5 py-4 text-[14px] font-semibold text-white">
                   {row.feature}
                 </th>
                 {([row.portal, row.fixer] as [Mark, string][]).map(([mark, text], i) => (
@@ -612,11 +630,14 @@ export function Comparison() {
 /* --------------------------------------------------------- 8. status ----- */
 
 const STATUS = [
-  { title: "Production ready", body: "Naka-deploy at bukas ang buong daloy ng produkto." },
-  { title: "Live website", body: "Naa-access ang serbisyo sa www.egovsuperagent.online." },
-  { title: "Modern SA identity", body: "Bagong app icon at pare-parehong branding sa lahat ng screen." },
-  { title: "Interactive intro", body: "Maikling paliwanag bago pumasok sa konsola." },
-  { title: "End-to-end workflow demo", body: "Masusubukan ang eTravel mula chat hanggang verification." },
+  { title: "Production ready", body: "Deployed, with the full product flow open to visitors." },
+  { title: "Live website", body: "The service is reachable at www.egovsuperagent.online." },
+  { title: "Modern SA identity", body: "A new app icon and consistent branding across every screen." },
+  { title: "Interactive intro", body: "A short guided explanation before entering the console." },
+  {
+    title: "End-to-end workflow",
+    body: "eTravel can be followed from chat through to verification.",
+  },
 ];
 
 export function Status() {
@@ -624,7 +645,7 @@ export function Status() {
     <Section bleed>
       <Eyebrow>Product status</Eyebrow>
       <SectionTitle>Live today.</SectionTitle>
-      <Lede>Narito na ang produkto. Masusubukan mo ito ngayon, hindi sa waitlist.</Lede>
+      <Lede>The product exists and can be used now, not from a waitlist.</Lede>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {STATUS.map((s) => (
@@ -669,7 +690,7 @@ export function Vision() {
           </span>
         </h2>
         <p className="mt-6 max-w-2xl text-pretty text-[18px] leading-relaxed text-[#A8B8D4]">
-          One chat, all government services. Designed to simplify digital government access for
+          One chat. Every government service. Designed to simplify digital government access for
           Filipinos at home and abroad.
         </p>
 
@@ -681,7 +702,7 @@ export function Vision() {
           <GhostButton href="/app">Add to home screen</GhostButton>
         </div>
         <p className="mt-4 text-[12.5px] text-[#5C7099]">
-          Buksan sa iyong browser, pindutin ang Share, at piliin ang Add to Home Screen.
+          Open it in your browser, tap Share, then choose Add to Home Screen.
         </p>
       </div>
     </Section>
@@ -703,7 +724,9 @@ export function PitchFooter() {
               </span>
             </div>
             <p className="mt-4 text-[13.5px] leading-relaxed text-[#8AA0C4]">
-              Built by {LICENSEE.name} — Renmar Sombilon.
+              Built by {LICENSEE.name}{" "}
+              {/* Kept together so the year never wraps onto a line of its own. */}
+              <span className="whitespace-nowrap">© 2026</span>
             </p>
           </div>
 
@@ -728,12 +751,10 @@ export function PitchFooter() {
             operator, and a request is only complete once the reference issued by that agency is
             recorded against it. Every request has a public verification page at
             egovsuperagent.online/verify/&lt;reference&gt;, which shows that record&apos;s current
-            status. Documents you upload are encrypted on your device; official fees are paid to
-            the agency in full.
+            status. Documents you upload are encrypted on your device; official fees are paid to the
+            agency in full.
           </p>
-          <p className="mt-5 text-[12.5px] text-[#5C7099]">
-            © 2026 {LICENSEE.short}. All rights reserved.
-          </p>
+          <p className="mt-5 text-[12.5px] text-[#5C7099]">All rights reserved.</p>
         </div>
       </div>
     </footer>
