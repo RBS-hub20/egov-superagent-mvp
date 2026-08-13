@@ -351,6 +351,8 @@ export interface FileNowResult {
   error?: string;
   /** Fields the table had no column for, so they were not written. */
   skippedFields?: string[];
+  /** The columns the update actually wrote. */
+  columnsUpdated?: string[];
 }
 
 /** Records the operator's attestation. */
@@ -358,6 +360,7 @@ export async function adminMarkFiled(input: FileNowInput): Promise<FileNowResult
   if ((await backend()) === "supabase") {
     const form = new FormData();
     form.set("id", input.id);
+    form.set("ref", input.ref);
     form.set("official_ref", input.official_ref);
     if (input.notes) form.set("notes", input.notes);
     // Files are optional: only attach what the operator actually chose.
@@ -376,6 +379,7 @@ export async function adminMarkFiled(input: FileNowInput): Promise<FileNowResult
       code?: string;
       hint?: string;
       skippedFields?: string[];
+      columnsUpdated?: string[];
     };
     if (!res.ok) {
       const detail = [body.error, body.hint && `Hint: ${body.hint}`, body.code && `(${body.code})`]
@@ -383,7 +387,11 @@ export async function adminMarkFiled(input: FileNowInput): Promise<FileNowResult
         .join(" ");
       return { order: null, error: detail || `Filing failed (HTTP ${res.status}).` };
     }
-    return { order: body.order ?? null, skippedFields: body.skippedFields };
+    return {
+      order: body.order ?? null,
+      skippedFields: body.skippedFields,
+      columnsUpdated: body.columnsUpdated,
+    };
   }
 
   const orders = readLocalOrders();

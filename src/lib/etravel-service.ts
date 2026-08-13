@@ -189,7 +189,18 @@ export async function toOrder(
     };
   }
 
-  const [qr_url, pdf_url] = await Promise.all([signed(client, row.qr_path), signed(client, row.pdf_path)]);
+  // A table may store the artifact as a bucket path (this repo's schema) or as
+  // a ready URL in a qr_url/pdf_url column. Sign the first, pass the second
+  // through — otherwise a filed record shows no documents at all.
+  const raw = row as unknown as Record<string, unknown>;
+  const directQr = typeof raw.qr_url === "string" ? raw.qr_url : null;
+  const directPdf = typeof raw.pdf_url === "string" ? raw.pdf_url : null;
+  const [signedQr, signedPdf] = await Promise.all([
+    signed(client, row.qr_path ?? null),
+    signed(client, row.pdf_path ?? null),
+  ]);
+  const qr_url = signedQr ?? directQr;
+  const pdf_url = signedPdf ?? directPdf;
 
   return {
     ...base,
