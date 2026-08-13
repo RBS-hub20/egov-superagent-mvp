@@ -302,11 +302,34 @@ export function subscribeOrders(onChange: () => void): () => void {
 
 /* -------------------------------------------------- owner console API ---- */
 
-export async function adminListOrders(): Promise<{ orders: ETravelOrder[]; backend: Backend }> {
+export interface AdminQueue {
+  orders: ETravelOrder[];
+  backend: Backend;
+  /** Rows the database reports, which can exceed the 200 returned. */
+  count?: number;
+  /** Set when the queue could not be read. An empty list is not the same thing. */
+  error?: string;
+}
+
+export async function adminListOrders(): Promise<AdminQueue> {
   if ((await backend()) === "supabase") {
-    const res = await fetch("/api/admin/etravel", { cache: "no-store" });
-    if (res.ok) return (await res.json()) as { orders: ETravelOrder[]; backend: Backend };
-    return { orders: [], backend: "supabase" };
+    let res: Response;
+    try {
+      res = await fetch("/api/admin/etravel", { cache: "no-store" });
+    } catch {
+      return { orders: [], backend: "supabase", error: "Could not reach the server." };
+    }
+    const body = (await res.json().catch(() => ({}))) as Partial<AdminQueue> & { error?: string };
+    if (!res.ok) {
+      // Reporting this as an empty queue is what made an auth or database
+      // failure look identical to "no declarations yet".
+      return {
+        orders: [],
+        backend: "supabase",
+        error: body.error ?? `The queue request failed (HTTP ${res.status}).`,
+      };
+    }
+    return { orders: body.orders ?? [], backend: "supabase", count: body.count, error: body.error };
   }
   // No project configured: the queue is whatever this browser filed. Said out
   // loud in the console header, because it is not a real queue.

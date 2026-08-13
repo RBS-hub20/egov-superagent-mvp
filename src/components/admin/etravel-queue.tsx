@@ -21,11 +21,13 @@ export function ETravelQueue({ onChanged }: { onChanged: () => void }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState<ETravelOrder | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     const result = await adminListOrders();
     setOrders(result.orders);
     setBackend(result.backend);
+    setError(result.error ?? null);
     setLoading(false);
   }, []);
 
@@ -77,6 +79,22 @@ export function ETravelQueue({ onChanged }: { onChanged: () => void }) {
         </span>
       </div>
 
+      {/* An empty queue and an unreadable queue must not look the same. */}
+      {error ? (
+        <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/[0.07] p-4">
+          <p className="text-[13.5px] font-semibold text-rose-300">Could not read the queue</p>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-rose-200/80">{error}</p>
+          <a
+            href="/api/admin/etravel?diagnose=1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-block text-[12.5px] font-semibold text-rose-200 underline underline-offset-4 hover:text-white"
+          >
+            Run connection diagnosis
+          </a>
+        </div>
+      ) : null}
+
       <Panel>
         {loading ? (
           <div className="flex items-center justify-center py-16 text-zinc-500">
@@ -88,7 +106,7 @@ export function ETravelQueue({ onChanged }: { onChanged: () => void }) {
             title="No pending eTravel"
             body={
               backend === "supabase"
-                ? "You're all caught up, boss. New declarations land here the moment a traveller submits one."
+                ? "The database returned no rows. If you are expecting one, open /api/admin/etravel?diagnose=1 — a key without service-role access reads zero rows and reports no error."
                 : "No Supabase project is configured, so this console only sees declarations filed in this browser."
             }
           />

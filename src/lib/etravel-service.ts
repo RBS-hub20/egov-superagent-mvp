@@ -52,6 +52,61 @@ export function isServiceConfigured(): boolean {
   return serviceClient() !== null;
 }
 
+/**
+ * What this deployment is actually connected to — for the diagnose endpoint.
+ *
+ * Reports the project host, which variable supplied it, and the key's role
+ * claim. Never the key itself: the role is the only part that matters when a
+ * query comes back empty, because a publishable key hits row level security
+ * and reads nothing without raising an error.
+ */
+export function describeConnection(): {
+  projectHost: string | null;
+  urlFrom: "SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_URL" | null;
+  keyRole: string;
+  keyIsServiceRole: boolean;
+} {
+  const explicit = process.env.SUPABASE_URL;
+  const url = explicit || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  const role = keyRole(key);
+
+  let projectHost: string | null = null;
+  try {
+    projectHost = url ? new URL(url).host : null;
+  } catch {
+    projectHost = url ?? null;
+  }
+
+  return {
+    projectHost,
+    urlFrom: explicit ? "SUPABASE_URL" : url ? "NEXT_PUBLIC_SUPABASE_URL" : null,
+    keyRole: role,
+    keyIsServiceRole: role === "service_role",
+  };
+}
+
+/** Reads the role out of a Supabase key without verifying or echoing it. */
+function keyRole(key: string): string {
+  if (!key) return "missing";
+  // Newer key format.
+  if (key.startsWith("sb_secret_")) return "service_role";
+  if (key.startsWith("sb_publishable_")) return "publishable (anon)";
+  // Legacy JWT format: the role lives in the unsigned payload.
+  const parts = key.split(".");
+  if (parts.length === 3) {
+    try {
+      const payload = JSON.parse(Buffer.from(parts[1], "base64").toString("utf8")) as {
+        role?: unknown;
+      };
+      return typeof payload.role === "string" ? payload.role : "unknown";
+    } catch {
+      return "unreadable";
+    }
+  }
+  return "unknown";
+}
+
 /** A ref is not a secret; the key that comes with it is. */
 export function newAccessKey(): string {
   const bytes = new Uint8Array(24);
