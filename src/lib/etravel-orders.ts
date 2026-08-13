@@ -345,23 +345,50 @@ export interface FileNowInput {
   pdf?: File | null;
 }
 
-/** Records the operator's attestation. Returns the updated order. */
-export async function adminMarkFiled(input: FileNowInput): Promise<ETravelOrder | null> {
+export interface FileNowResult {
+  order: ETravelOrder | null;
+  /** The server's own words when it fails. Never a generic stand-in. */
+  error?: string;
+  /** Fields the table had no column for, so they were not written. */
+  skippedFields?: string[];
+}
+
+/** Records the operator's attestation. */
+export async function adminMarkFiled(input: FileNowInput): Promise<FileNowResult> {
   if ((await backend()) === "supabase") {
     const form = new FormData();
     form.set("id", input.id);
     form.set("official_ref", input.official_ref);
     if (input.notes) form.set("notes", input.notes);
-    if (input.qr) form.set("qr", input.qr);
-    if (input.pdf) form.set("pdf", input.pdf);
-    const res = await fetch("/api/admin/etravel/file", { method: "POST", body: form });
-    if (res.ok) return ((await res.json()) as { order: ETravelOrder }).order;
-    return null;
+    // Files are optional: only attach what the operator actually chose.
+    if (input.qr && input.qr.size > 0) form.set("qr", input.qr);
+    if (input.pdf && input.pdf.size > 0) form.set("pdf", input.pdf);
+
+    let res: Response;
+    try {
+      res = await fetch("/api/admin/etravel/file", { method: "POST", body: form });
+    } catch {
+      return { order: null, error: "Could not reach the server." };
+    }
+    const body = (await res.json().catch(() => ({}))) as {
+      order?: ETravelOrder;
+      error?: string;
+      code?: string;
+      hint?: string;
+      skippedFields?: string[];
+    };
+    if (!res.ok) {
+      const detail = [body.error, body.hint && `Hint: ${body.hint}`, body.code && `(${body.code})`]
+        .filter(Boolean)
+        .join(" ");
+      return { order: null, error: detail || `Filing failed (HTTP ${res.status}).` };
+    }
+    return { order: body.order ?? null, skippedFields: body.skippedFields };
   }
 
   const orders = readLocalOrders();
   const idx = orders.findIndex((o) => o.id === input.id || o.ref === input.ref);
-  if (idx === -1) return null;
+  if (idx === -1) return { order: null, error: "That order is not in this browser's store." };
   const updated: ETravelOrder = {
     ...orders[idx],
     status: "FILED",
@@ -375,7 +402,7 @@ export async function adminMarkFiled(input: FileNowInput): Promise<ETravelOrder 
   };
   orders[idx] = updated;
   writeLocalOrders(orders);
-  return updated;
+  return { order: updated };
 }
 
 /* ------------------------------------------------ traveller notified ----- */

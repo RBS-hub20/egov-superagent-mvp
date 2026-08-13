@@ -110,12 +110,12 @@ export function FileNowModal({
     if (!order) return;
     const reference = officialRef.trim();
     if (!reference) {
-      setError("Ilagay ang official reference galing sa eTravel bago i-mark as filed.");
+      setError("Enter the official reference from eTravel before marking this filed.");
       return;
     }
     setBusy(true);
     setError(null);
-    const updated = await adminMarkFiled({
+    const result = await adminMarkFiled({
       id: order.id,
       ref: order.ref,
       official_ref: reference,
@@ -124,9 +124,15 @@ export function FileNowModal({
       pdf,
     });
     setBusy(false);
-    if (!updated) {
-      setError("Hindi na-save. Tingnan ang connection at subukan ulit.");
+    if (!result.order) {
+      // The server's own message, not a stand-in that hides it.
+      setError(result.error ?? "The filing was not saved.");
       return;
+    }
+    if (result.skippedFields?.length) {
+      setError(
+        `Filed, but this table has no column for: ${result.skippedFields.join(", ")}. Those values were not saved.`
+      );
     }
     onFiled();
   }
