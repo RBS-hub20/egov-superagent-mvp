@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { motion } from "framer-motion";
-import { BrainCircuit, IdCard, Lock, LogOut, Plus, ScrollText, User as UserIcon, X } from "lucide-react";
+import { BrainCircuit, IdCard, Lock, LogOut, Plane, Plus, ScrollText, User as UserIcon, X } from "lucide-react";
 import { BrandLockup } from "@/components/brand/brand-lockup";
 import { AGENCIES, memoryFactsFor } from "@/lib/data";
 import { clearUser, initialsOf, useUser } from "@/lib/user";
@@ -63,7 +63,27 @@ export function Sidebar({
       </div>
 
       <nav className="mt-7 flex-1 overflow-y-auto px-4 eg-scroll">
-        <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-lp-body/55 dark:text-lp-dark-muted/70">
+        {/* Flights sits above the agency list rather than inside it: booking a
+            seat is a service this app sells, not a government body it talks to. */}
+        <Link
+          href="/app/flights"
+          className="flex items-center gap-2.5 rounded-xl border border-lp-line bg-white/70 px-3 py-2.5 transition hover:border-lp-primary/30 hover:bg-white dark:border-lp-dark-line dark:bg-white/[0.03] dark:hover:border-lp-primary/40 dark:hover:bg-white/[0.06]"
+        >
+          <Plane className="h-4 w-4 shrink-0 text-lp-primary" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13.5px] font-semibold text-lp-ink dark:text-lp-dark-text">
+              Flights
+            </p>
+            <p className="truncate text-[10.5px] text-lp-body/70 dark:text-lp-dark-muted/80">
+              Book cheaper + FREE eTravel
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full bg-lp-yellow/20 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-[0.1em] text-amber-600 dark:text-lp-yellow">
+            New
+          </span>
+        </Link>
+
+        <p className="mt-6 px-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-lp-body/55 dark:text-lp-dark-muted/70">
           Connected Agencies
         </p>
         <ul className="mt-3 space-y-1.5">

@@ -18,6 +18,7 @@ const PUBLIC_PATHS = new Set([
   "/product", // legacy path, redirects to /
   "/onboarding", // legacy path, redirects to /intro
   "/app", // SuperAgent console
+  "/app/flights", // flights + bundled eTravel
   "/app/signup",
   "/app/login",
 ]);
